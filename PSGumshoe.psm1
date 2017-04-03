@@ -184,6 +184,7 @@ function Get-NamedPipe {
 	#>
 
   [CmdletBinding()]
+	[OutputType([PSObject])]
 	param ()
 	begin {
 		$PipeList = @()	
