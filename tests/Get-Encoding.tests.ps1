@@ -3,16 +3,16 @@ Describe -Name 'Get-PsgEncoding' {
     $Path = "$TestDrive\Test.txt"
     Add-Content -Path $Path -Value "This is a pester test."
 
-    It -Name 'Runs without errors' -Pending -Test {
+    It -Name 'Runs without errors' -Test {
         {Get-PsgEncoding -Path $Path} | Should Not Throw
     }
-    It -Name 'Accepts Pipeline Input' -Pending -Test {
-        {TestDrive:\Test.txt | Get-PsgEncoding} | Should Not Throw
+    It -Name 'Accepts Pipeline Input' -Test {
+        {$Path | Get-PsgEncoding} | Should Not Throw
     }
-    It -Name 'Returns the correct Path' -Pending -Test {
+    It -Name 'Returns the correct Path' -Test {
         (Get-PsgEncoding -Path $Path).Path | Should Be $Path
     }
-    It -Name 'Returns the correct encoding' -Pending -Test {
-        (Get-PsgEncoding -Path $Path).Encoding | Should Be 'Encoding'
+    It -Name 'Returns the correct encoding' -Test {
+        (Get-PsgEncoding -Path $Path).Encoding | Should Be 'Unicode (UTF-8)'
     }
 }
