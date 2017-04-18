@@ -202,3 +202,68 @@ function Get-NamedPipe {
 		Write-Output -InputObject $PipeList	
 	}
 }
+function Get-Encoding {
+    <#
+        .SYNOPSIS
+            Gets File Encoding Information
+        .DESCRIPTION
+            This function gets file encoding information utilizing the .Net class System.IO.StreamReader.
+        .INPUTS
+            System.String
+        .OUTPUTS
+            PSObject
+        .PARAMETER Path
+            Path of the file to receive encoding information about.
+        .EXAMPLE
+            C:\PS> Get-PsgEncoding -Path File.txt
+ 
+            Description
+            -----------
+            Gets the encoding of the file File.txt
+        .EXAMPLE
+            C:\PS> Get-PsgChildItem -Filter *.txt | Get-Encoding
+           
+            Description
+            -----------
+            Gets all text files and displays the encoding.
+        .EXAMPLE
+            C:\PS> Get-PsgEncoding Test.txt
+           
+            Description
+            -----------
+            Gets the encoding of Test.txt
+    #>
+    [OutputType('PSObject')]
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true,
+                   ValueFromPipeline=$true)]
+        [String]$Path
+    )
+    begin{}
+    process{
+        ## Getting full file name to overcome limits of .Net class.
+        $File = $(Get-ChildItem $Path | Select-Object -ExpandProperty FullName)
+ 
+        ## Testing to see if path exists
+        if (Test-Path -Path $File) {
+            ## Getting encoding
+            $Stream = New-Object -TypeName System.IO.StreamReader -ArgumentList $File
+            $Encoding = $Stream.CurrentEncoding | Select-Object -ExpandProperty EncodingName
+        } else {
+            ## Error on no file exists
+            Write-Error -Message "File doesn't exist."
+        }
+ 
+        ## Create Output PSOBject
+        $Properties = @{
+            'Path' = $File;
+            'Encoding' = $Encoding
+        }
+        $Object = New-Object -TypeName PSObject -Property $Properties
+       
+        ## Write-Output
+        Write-Output -InputObject $Object
+    }
+    end{}
+}
