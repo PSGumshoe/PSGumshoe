@@ -1,558 +1,46 @@
-function Measure-CharacterFrequency
-{
-    <# 
-    
-    .SYNOPSIS 
-    
-    Measures the letter / character frequency in a block of text, ignoring whitespace 
-    and PowerShell comment blocks. 
-    
-    #>
 
-    [CmdletBinding(DefaultParameterSetName = "ByPath")]
-    param(
-        ## The path of items with content
-        [Parameter(ParameterSetName = "ByPath", Position = 0)]
-        $Path,
-
-        ## The literal path of items with content
-        [Parameter(ParameterSetName = "ByLiteralPath", Position = 0, ValueFromPipelineByPropertyName)]
-        [Alias("PSPath")]
-        $LiteralPath,
-
-        ## The actual content to be measured
-        [Parameter(ParameterSetName = "ByContent")]
-        [String]
-        $Content    
-    )
-
-    begin
-    {
-        $characterMap = @{}
-    }
-
-    process
-    {
-        if($PSCmdlet.ParameterSetName -ne "ByContent")
-        {
-            ## If the items were piped in or supplied by Path / LiteralPath, get the content of each of them. 
-            Get-ChildItem @PSBoundParameters | Foreach-Object {
-                $content = Get-Content -LiteralPath $_.FullName -Raw
-                
-                ## Remove comments and whitespace
-                ($content -replace '(?s)<#.*?#>','' -replace '#.*','' -replace '(?s)\s','').ToCharArray() | % {
-                    $key = $_.ToString().ToUpper()
-
-                    ## And store the character frequency for each character
-                    $characterMap[$key] = 1 + $characterMap[$key] }
-            }
-        }
-        else
-        {
-            ## Remove comments and whitespace
-            ($content -replace '(?s)<#.*?#>','' -replace '#.*','' -replace '\s','').ToCharArray() | % {
-                $key = $_.ToString().ToUpper()
-
-                ## And store the character frequency for each character
-                $characterMap[$key] = 1 + $characterMap[$key] }
-        }   
-    }
-
-    end
-    {
-        ## Figure out how many characters were present in total so that we can calculate a percentage
-        $total = $characterMap.GetEnumerator() | Measure-Object -sum Value | % Sum
-
-        ## And generate nice object-based output for each character and its frequency
-        $characterMap.GetEnumerator() | Sort-Object -desc value | % {
-            [PSCustomObject] @{ Name = $_.Name; Percent = [Math]::Round($_.Value / $total * 100, 3) } }
-    }
-}
-
-function Measure-DamerauLevenshteinDistance
-{
-    <# 
-    
-    .SYNOPSIS 
-    
-    Measures the edit distance between two sequences. 
-    
-    .DESCRIPTION
-    
-    The Damerau–Levenshtein distance between two words is the minimum number of operations (consisting of insertions, deletions or substitutions of a single character, or transposition of two adjacent characters) required to change one word into the other.
-    This can be used to identify malware masquerading as a legitmate process among other things.
-    
-    .NOTES
-    
-    Author - Jared Atkinson (@jaredcatkinson)
-    
-    .LINK
-
-    https://en.wikipedia.org/wiki/Damerau-Levenshtein_distance
-
-    .LINK
-
-    https://gist.github.com/wickedshimmy/449595
-
-    .EXAMPLE 
-    
-    PS > Measure-DamerauLevenshteinDistance svchost.exe scvhost.exe 
-    1 
-
-    #>
-
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory = $true, Position = 0)]
-        [string]
-        $Original,
-
-        [Parameter(Mandatory = $true, Position = 1)]
-        [string]
-        $Modified
-    )
-
-    if ($original -eq $modified)
-    {
-        return 0
-    }
-
-    $len_orig = $original.Length
-    $len_diff = $modified.Length
-
-    if ($len_orig -eq 0)
-    {
-        return $len_diff
-    }
-
-    if ($len_diff -eq 0)
-    {
-        return $len_orig
-    }
-
-    $matrix = New-Object -TypeName 'object[,]' ($len_orig + 1), ($len_diff + 1)
-
-    for ($i = 1; $i -le $len_orig; $i++)
-    {
-        $matrix[$i,0] = $i
-
-        for ($j = 1; $j -le $len_diff; $j++)
-        {
-            if ($modified[$j - 1] -eq $original[$i - 1])
-            {
-                $cost = 0
-            }
-            else
-            {
-                $cost = 1
-            }
-
-            if ($i -eq 1)
-            {
-                $matrix[0,$j] = $j
-            }
-
-            $v1 = $matrix[($i - 1), $j] + 1
-            $v2 = $matrix[$i, ($j - 1)] + 1
-            $v3 = $matrix[($i - 1), ($j - 1)] + $cost
-            $vals = @($v1, $v2, $v3)
-
-            $matrix[$i,$j] = ($vals | Measure-Object -Minimum).Minimum
-
-            if (($i -gt 1) -and ($j -gt 1) -and ($original[$i - 1] -eq $modified[$j - 2]) -and ($original[$i - 2] -eq $modified[$j - 1]))
-            {
-                $val1 = $matrix[$i, $j]
-                $val2 = $matrix[($i - 2), ($j - 2)] + $cost
-                $matrix[$i, $j] = [Math]::Min($val1, $val2)
-            }
-        }
-    }
-    return $matrix[$len_orig, $len_diff]
-}
-
-
-function Measure-VectorSimilarity
-{
-    <# 
-    
-    .SYNOPSIS 
-    
-    Measures the vector / cosine similarity between two sets of items. 
-    See: https://en.wikipedia.org/wiki/Cosine_similarity 
-    
-    .EXAMPLE 
-    
-    PS > .\Measure-VectorSimilarity.ps1 @(1..10) @(3..8) 
-    0.775 
-    
-    .EXAMPLE 
-    
-    PS > $items = dir c:\windows\ | Select -First 10 
-    PS > $items2 = dir c:\windows\ | Select -First 8 
-    PS > .\Measure-VectorSimilarity.ps1 $items $items2 -KeyProperty Name -ValueProperty Length 
-    0.894 
-    
-    #>
-
-    [CmdletBinding()]
-    param(
-        ## The first set of items to compare
-        [Parameter(Position = 0)]
-        $Set1,
-
-        ## The second set of items to compare
-        [Parameter(Position = 1)]   
-        $Set2,
-        
-        ## If the item sets represent objects that have a main property
-        ## (like file names), the name of that key property 
-        [Parameter()]
-        $KeyProperty,
-
-        ## If the item sets represent objects that have a main property
-        ## to represent the values (like Count or Percent),
-        ## the name of that key property. If they don't have a property
-        ## like this, simple existence of the item will be used. 
-        [Parameter()]
-        $ValueProperty
-    )
-
-    ## If either set is empty, there is no similarity
-    if((-not $Set1) -or (-not $Set2))
-    {
-        return 0
-    }
-
-    ## Figure out the unique set of items to be compared - either based on
-    ## the key property (if specified), or the item value directly
-    $allkeys = @($Set1) + @($Set2) | Foreach-Object {
-        if($PSBoundParameters.ContainsKey("KeyProperty")) { $_.$KeyProperty }
-        else { $_ }
-    } | Sort-Object -Unique
-
-    ## Figure out the values of items to be compared - either based on
-    ## the value property (if specified), or the item value directly. Put
-    ## these into a hashtable so that we can process them efficiently.
-
-    $set1Hash = @{}
-    $set2Hash = @{}
-    $setsToProcess = @($Set1, $Set1Hash), @($Set2, $Set2Hash)
-
-    foreach($set in $setsToProcess)
-    {
-        $set[0] | Foreach-Object {
-            if($PSBoundParameters.ContainsKey("ValueProperty")) { $value = $_.$ValueProperty }
-            else { $value = 1 }
-            
-            if($PSBoundParameters.ContainsKey("KeyProperty")) { $_ = $_.$KeyProperty }
-
-            $set[1][$_] = $value
-        }
-    }
-
-    ## Calculate the vector / cosine similarity of the two sets
-    ## based on their keys and values.
-    $dot = 0
-    $mag1 = 0
-    $mag2 = 0
-
-    foreach($key in $allkeys)
-    {
-        $dot += $set1Hash[$key] * $set2Hash[$key]
-        $mag1 +=  ($set1Hash[$key] * $set1Hash[$key])
-        $mag2 +=  ($set2Hash[$key] * $set2Hash[$key])
-    }
-
-    $mag1 = [Math]::Sqrt($mag1)
-    $mag2 = [Math]::Sqrt($mag2)
-
-    ## Return the result
-    [Math]::Round($dot / ($mag1 * $mag2), 3)
-}
-
-function Get-NamedPipe {
-	<#
-		.SYNOPSIS
-			Gets named pipes on local computer.
-		
-		.DESCRIPTION
-			Gets named pipes on the local computer.
-		
-		.EXAMPLE
-			PS C:\> Get-PsgNamedPipes
-		
-		.NOTES
-			Additional information about the function.
-	#>
-
-  [CmdletBinding()]
-	[OutputType([PSObject])]
-	param ()
-	begin {
-		$PipeList = @()	
-	}
-	process{
-		$Pipes = [IO.Directory]::GetFiles('\\.\pipe\')
-		
-		foreach ($Pipe in $Pipes) {
-			$Object = New-Object -TypeName PSObject -Property (@{ 'NamedPipe' = $Pipe })
-			$PipeList += $Object
-			
-		}
-	}
-	end {
-		Write-Output -InputObject $PipeList	
-	}
-}
-
-<#
-Author: Lee Christensen (@tifkin_)
-License: BSD 3-Clause
-Required Dependencies: None
-Optional Dependencies: None
-#>
-function Get-LogonSession
-{
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [UInt32]
-        $LogonId
-    )
-    
-    $LogonMap = @{}
-    Get-WmiObject Win32_LoggedOnUser  | %{
-    
-        $Identity = $_.Antecedent | Select-String 'Domain="(.*)",Name="(.*)"'
-        $LogonSession = $_.Dependent | Select-String 'LogonId="(\d+)"'
-
-        $LogonMap[$LogonSession.Matches[0].Groups[1].Value] = New-Object PSObject -Property @{
-            Domain = $Identity.Matches[0].Groups[1].Value
-            UserName = $Identity.Matches[0].Groups[2].Value
-        }
-    }
-
-    Get-WmiObject Win32_LogonSession -Filter "LogonId = `"$($LogonId)`"" | %{
-        $LogonType = $Null
-        switch($_.LogonType) {
-            $null {$LogonType = 'None'}
-            0 { $LogonType = 'System' }
-            2 { $LogonType = 'Interactive' }
-            3 { $LogonType = 'Network' }
-            4 { $LogonType = 'Batch' }
-            5 { $LogonType = 'Service' }
-            6 { $LogonType = 'Proxy' }
-            7 { $LogonType = 'Unlock' }
-            8 { $LogonType = 'NetworkCleartext' }
-            9 { $LogonType = 'NewCredentials' }
-            10 { $LogonType = 'RemoteInteractive' }
-            11 { $LogonType = 'CachedInteractive' }
-            12 { $LogonType = 'CachedRemoteInteractive' }
-            13 { $LogonType = 'CachedUnlock' }
-            default { $LogonType = $_.LogonType}
-        }
-
-        New-Object PSObject -Property @{
-            UserName = $LogonMap[$_.LogonId].UserName
-            Domain = $LogonMap[$_.LogonId].Domain
-            LogonId = $_.LogonId
-            LogonType = $LogonType
-            AuthenticationPackage = $_.AuthenticationPackage
-            Caption = $_.Caption
-            Description = $_.Description
-            InstallDate = $_.InstallDate
-            Name = $_.Name
-            StartTime = $_.ConvertToDateTime($_.StartTime)
-        }
-    }
-}
-
-function Get-InjectedThread
-{
-    <# 
-    
-    .SYNOPSIS 
-    
-    Looks for threads that were created as a result of code injection.
-    
-    .DESCRIPTION
-    
-    Memory resident malware (fileless malware) often uses a form of memory injection to get code execution. Get-InjectedThread looks at each running thread to determine if it is the result of memory injection.
-    
-    Common memory injection techniques that *can* be caught using this method include:
-    - Classic Injection (OpenProcess, VirtualAllocEx, WriteProcessMemory, CreateRemoteThread)
-    - Reflective DLL Injection
-    - Process Hollowing
-
-    NOTE: Nothing in security is a silver bullet. An attacker could modify their tactics to avoid detection using this methodology.
-    
-    .NOTES
-
-    Author - Jared Atkinson (@jaredcatkinson)
-
-    .EXAMPLE 
-    
-    PS > Get-InjectedThread 
-
-    ProcessName               : ThreadStart.exe
-    ProcessId                 : 7784
-    Path                      : C:\Users\tester\Desktop\ThreadStart.exe
-    KernelPath                : C:\Users\tester\Desktop\ThreadStart.exe
-    CommandLine               : "C:\Users\tester\Desktop\ThreadStart.exe"
-    PathMismatch              : False
-    ThreadId                  : 14512
-    AllocatedMemoryProtection : PAGE_EXECUTE_READWRITE
-    MemoryProtection          : PAGE_EXECUTE_READWRITE
-    MemoryState               : MEM_COMMIT
-    MemoryType                : MEM_PRIVATE
-    BasePriority              : 8
-    IsUniqueThreadToken       : False
-    Integrity                 : MEDIUM_MANDATORY_LEVEL
-    Privilege                 : SeChangeNotifyPrivilege
-    LogonId                   : 999
-    SecurityIdentifier        : S-1-5-21-386661145-2656271985-3844047388-1001
-    UserName                  : DESKTOP-HMTGQ0R\SYSTEM
-    LogonSessionStartTime     : 3/15/2017 5:45:38 PM
-    LogonType                 : System
-    AuthenticationPackage     : NTLM
-    BaseAddress               : 4390912
-    Size                      : 4096
-    Bytes                     : {144, 195, 0, 0...}
-    
-    #>
-
-    [CmdletBinding()]
-    param
-    (
-
-    )
-
-    $hSnapshot = CreateToolhelp32Snapshot -ProcessId 0 -Flags 4
-
-    $Thread = Thread32First -SnapshotHandle $hSnapshot
-    do
-    {
-        $proc = Get-Process -Id $Thread.th32OwnerProcessId
-        
-        if($Thread.th32OwnerProcessId -ne 0 -and $Thread.th32OwnerProcessId -ne 4)
-        {
-            $hThread = OpenThread -ThreadId $Thread.th32ThreadID -DesiredAccess $THREAD_ALL_ACCESS -InheritHandle $false
-            if($hThread -ne 0)
-            {
-                $BaseAddress = NtQueryInformationThread -ThreadHandle $hThread
-                $hProcess = OpenProcess -ProcessId $Thread.th32OwnerProcessID -DesiredAccess $PROCESS_ALL_ACCESS -InheritHandle $false
-                
-                if($hProcess -ne 0)
-                {
-                    $memory_basic_info = VirtualQueryEx -ProcessHandle $hProcess -BaseAddress $BaseAddress
-                    $AllocatedMemoryProtection = $memory_basic_info.AllocationProtect -as $MemProtection
-                    $MemoryProtection = $memory_basic_info.Protect -as $MemProtection
-                    $MemoryState = $memory_basic_info.State -as $MemState
-                    $MemoryType = $memory_basic_info.Type -as $MemType
-                    
-                    if($MemoryState -eq $MemState::MEM_COMMIT -and $MemoryType -ne $MemType::MEM_IMAGE)
-                    {   
-                        $buf = ReadProcessMemory -ProcessHandle $hProcess -BaseAddress $BaseAddress -Size 100
-                        $proc = Get-WmiObject Win32_Process -Filter "ProcessId = '$($Thread.th32OwnerProcessID)'"
-                        $KernelPath = QueryFullProcessImageName -ProcessHandle $hProcess
-                        $PathMismatch = $proc.Path.ToLower() -ne $KernelPath.ToLower()
-                                    
-                        # check if thread has unique token
-                        try
-                        {
-                            $hThreadToken = OpenThreadToken -ThreadHandle $hThread -DesiredAccess $TOKEN_ALL_ACCESS
-                            $SID = GetTokenInformation -TokenHandle $hThreadToken -TokenInformationClass 1
-                            $Privs = GetTokenInformation -TokenHandle $hThreadToken -TokenInformationClass 3 
-                            $LogonSession = GetTokenInformation -TokenHandle $hThreadToken -TokenInformationClass 17 
-                            $Integrity = GetTokenInformation -TokenHandle $hThreadToken -TokenInformationClass 25 
-                            $IsUniqueThreadToken = $true               
-                        }
-                        catch
-                        {
-                            $hProcessToken = OpenProcessToken -ProcessHandle $hProcess -DesiredAccess $TOKEN_ALL_ACCESS
-                            $SID = GetTokenInformation -TokenHandle $hProcessToken -TokenInformationClass 1
-                            $Privs = GetTokenInformation -TokenHandle $hProcessToken -TokenInformationClass 3 
-                            $LogonSession = GetTokenInformation -TokenHandle $hProcessToken -TokenInformationClass 17 
-                            $Integrity = GetTokenInformation -TokenHandle $hProcessToken -TokenInformationClass 25
-                            $IsUniqueThreadToken = $false
-                        }
-                        
-                        $ThreadDetail = New-Object PSObject
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name ProcessName -Value $proc.Name
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name ProcessId -Value $proc.ProcessId
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name Path -Value $proc.Path
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name KernelPath -Value $KernelPath
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name CommandLine -Value $proc.CommandLine
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name PathMismatch -Value $PathMismatch
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name ThreadId -Value $Thread.th32ThreadId
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name AllocatedMemoryProtection -Value $AllocatedMemoryProtection
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name MemoryProtection -Value $MemoryProtection
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name MemoryState -Value $MemoryState
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name MemoryType -Value $MemoryType
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name BasePriority -Value $Thread.tpBasePri
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name IsUniqueThreadToken -Value $IsUniqueThreadToken
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name Integrity -Value $Integrity
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name Privilege -Value $Privs
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name LogonId -Value $LogonSession.LogonId
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name SecurityIdentifier -Value $SID
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name UserName -Value "$($LogonSession.Domain)\$($LogonSession.UserName)"
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name LogonSessionStartTime -Value $LogonSession.StartTime
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name LogonType -Value $LogonSession.LogonType
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name AuthenticationPackage -Value $LogonSession.AuthenticationPackage
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name BaseAddress -Value $BaseAddress
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name Size -Value $memory_basic_info.RegionSize
-                        $ThreadDetail | Add-Member -MemberType Noteproperty -Name Bytes -Value $buf
-                        Write-Output $ThreadDetail
-                    }
-                    CloseHandle($hProcess)
-                }
-            }
-            CloseHandle($hThread)
-        }
-    } while($Kernel32::Thread32Next($hSnapshot, [ref]$Thread))
-    CloseHandle($hSnapshot)
-}
-
-function Stop-Thread
-{
-    <# 
-    
-    .SYNOPSIS 
-    
-    Terminates a specified Thread. 
-
-    .DESCRIPTION
-
-    The Stop-Thread function can stop an individual thread in a process. This is quite useful in situations where code injection (dll injection) techniques have been used by attackers. If an attacker runs their malicious code in a thread within a critical process, then Stop-Thread can kill the malicious thread without hurting the critical process.
-
-    .NOTES
-
-    Author - Jared Atkinson (@jaredcatkinson)
-
-    .EXAMPLE 
-    
-    PS > Stop-Thread -ThreadId 1776 
-
-    #>
-
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory = $true, Position = 0)]
-        [UInt32]
-        $ThreadId
-    )
-    
-    $hThread = OpenThread -ThreadId $ThreadId -DesiredAccess $THREAD_TERMINATE
-    TerminateThread -ThreadHandle $hThread
-    CloseHandle -Handle $hThread
-}
+# Importing module files
+# Directory Service Functions
+#-----------------------------
+. $PSScriptRoot\DirectoryService\PrivateFunctions.ps1
+. $PSScriptRoot\DirectoryService\Get-DSForest.ps1
+. $PSScriptRoot\DirectoryService\Get-DSDirectoryEntry.ps1
+. $PSScriptRoot\DirectoryService\Get-DSDirectorySearcher.ps1
+. $PSScriptRoot\DirectoryService\Get-DSComputer.ps1
+. $PSScriptRoot\DirectoryService\Get-DSDomain.ps1
+. $PSScriptRoot\DirectoryService\Get-DSGpo.ps1
+. $PSScriptRoot\DirectoryService\Get-DSUser.ps1
+. $PSScriptRoot\DirectoryService\Get-DSReplicationAttribute.ps1
+. $PSScriptRoot\DirectoryService\Get-DSGroup.ps1
+. $PSScriptRoot\DirectoryService\Get-DSGroupMember.ps1
+. $PSScriptRoot\DirectoryService\Get-DSOU.ps1
+. $PSScriptRoot\DirectoryService\Get-DSTrust.ps1
+. $PSScriptRoot\DirectoryService\Get-DSObjectAcl.ps1
+
+# Volatile Information Functions
+#-----------------------------
+. $PSScriptRoot\Volatile\Get-InjectedThread.ps1
+. $PSScriptRoot\Volatile\Get-LogonSession.ps1
+. $PSScriptRoot\Volatile\Get-NamedPipe.ps1
+. $PSScriptRoot\Volatile\Stop-Thread.ps1
+
+# Analysis Functions
+#-----------------------------
+. $PSScriptRoot\Analysis\Measure-CharacterFrequency.ps1
+. $PSScriptRoot\Analysis\Measure-DamerauLevenshteinDistance.ps1
+. $PSScriptRoot\Analysis\Measure-VectorSimilarity.ps1
+
+# Event Log Functions
+#-----------------------------
+. $PSScriptRoot\EventLog\Get-EventPsEngineState.ps1
+. $PSScriptRoot\EventLog\Get-EventPsIPC.ps1
+. $PSScriptRoot\EventLog\Get-EventPsPipeline.ps1
+. $PSScriptRoot\EventLog\Get-EventPsScriptBlock.ps1
+. $PSScriptRoot\EventLog\Get-WinEventBaseXPathFilter.ps1
 
 #region PSReflect
 
-function New-InMemoryModule
-{
+function New-InMemoryModule {
 <#
 .SYNOPSIS
 
@@ -562,7 +50,7 @@ Author: Matthew Graeber (@mattifestation)
 License: BSD 3-Clause
 Required Dependencies: None
 Optional Dependencies: None
- 
+
 .DESCRIPTION
 
 When defining custom enums, structs, and unmanaged functions, it is
@@ -580,8 +68,7 @@ ModuleName is not provided, it will default to a GUID.
 $Module = New-InMemoryModule -ModuleName Win32
 #>
 
-    Param
-    (
+    Param (
         [Parameter(Position = 0)]
         [ValidateNotNullOrEmpty()]
         [String]
@@ -607,10 +94,8 @@ $Module = New-InMemoryModule -ModuleName Win32
 
 # A helper function used to reduce typing while defining function
 # prototypes for Add-Win32Type.
-function func
-{
-    Param
-    (
+function func {
+    Param (
         [Parameter(Position = 0, Mandatory = $True)]
         [String]
         $DllName,
@@ -657,8 +142,7 @@ function func
     New-Object PSObject -Property $Properties
 }
 
-function Add-Win32Type
-{
+function Add-Win32Type {
 <#
 .SYNOPSIS
 
@@ -668,7 +152,7 @@ Author: Matthew Graeber (@mattifestation)
 License: BSD 3-Clause
 Required Dependencies: None
 Optional Dependencies: func
- 
+
 .DESCRIPTION
 
 Add-Win32Type enables you to easily interact with unmanaged (i.e.
@@ -795,35 +279,23 @@ are all incorporated into the same in-memory module.
         $Namespace = ''
     )
 
-    BEGIN
-    {
+    BEGIN {
         $TypeHash = @{}
     }
 
-    PROCESS
-    {
-        if ($Module -is [Reflection.Assembly])
-        {
-            if ($Namespace)
-            {
+    PROCESS {
+        if ($Module -is [Reflection.Assembly]) {
+            if ($Namespace) {
                 $TypeHash[$DllName] = $Module.GetType("$Namespace.$DllName")
-            }
-            else
-            {
+            } else {
                 $TypeHash[$DllName] = $Module.GetType($DllName)
             }
-        }
-        else
-        {
+        } else {
             # Define one type for each DLL
-            if (!$TypeHash.ContainsKey($DllName))
-            {
-                if ($Namespace)
-                {
+            if (!$TypeHash.ContainsKey($DllName)) {
+                if ($Namespace) {
                     $TypeHash[$DllName] = $Module.DefineType("$Namespace.$DllName", 'Public,BeforeFieldInit')
-                }
-                else
-                {
+                } else {
                     $TypeHash[$DllName] = $Module.DefineType($DllName, 'Public,BeforeFieldInit')
                 }
             }
@@ -836,10 +308,8 @@ are all incorporated into the same in-memory module.
 
             # Make each ByRef parameter an Out parameter
             $i = 1
-            foreach($Parameter in $ParameterTypes)
-            {
-                if ($Parameter.IsByRef)
-                {
+            foreach($Parameter in $ParameterTypes) {
+                if ($Parameter.IsByRef) {
                     [void] $Method.DefineParameter($i, 'Out', $null)
                 }
 
@@ -874,17 +344,15 @@ are all incorporated into the same in-memory module.
 
     END
     {
-        if ($Module -is [Reflection.Assembly])
-        {
+        if ($Module -is [Reflection.Assembly]) {
             return $TypeHash
         }
 
         $ReturnTypes = @{}
 
-        foreach ($Key in $TypeHash.Keys)
-        {
+        foreach ($Key in $TypeHash.Keys) {
             $Type = $TypeHash[$Key].CreateType()
-            
+
             $ReturnTypes[$Key] = $Type
         }
 
@@ -892,8 +360,7 @@ are all incorporated into the same in-memory module.
     }
 }
 
-function psenum
-{
+function psenum {
 <#
 .SYNOPSIS
 
@@ -903,7 +370,7 @@ Author: Matthew Graeber (@mattifestation)
 License: BSD 3-Clause
 Required Dependencies: None
 Optional Dependencies: None
- 
+
 .DESCRIPTION
 
 The 'psenum' function facilitates the creation of enums entirely in
@@ -960,8 +427,7 @@ New-Enum. :P
 #>
 
     [OutputType([Type])]
-    Param
-    (
+    Param (
         [Parameter(Position = 0, Mandatory = $True)]
         [ValidateScript({($_ -is [Reflection.Emit.ModuleBuilder]) -or ($_ -is [Reflection.Assembly])})]
         $Module,
@@ -984,8 +450,7 @@ New-Enum. :P
         $Bitfield
     )
 
-    if ($Module -is [Reflection.Assembly])
-    {
+    if ($Module -is [Reflection.Assembly]) {
         return ($Module.GetType($FullName))
     }
 
@@ -1011,22 +476,20 @@ New-Enum. :P
 
 # A helper function used to reduce typing while defining struct
 # fields.
-function field
-{
-    Param
-    (
+function field {
+    Param (
         [Parameter(Position = 0, Mandatory = $True)]
         [UInt16]
         $Position,
-        
+
         [Parameter(Position = 1, Mandatory = $True)]
         [Type]
         $Type,
-        
+
         [Parameter(Position = 2)]
         [UInt16]
         $Offset,
-        
+
         [Object[]]
         $MarshalAs
     )
@@ -1039,8 +502,7 @@ function field
     }
 }
 
-function struct
-{
+function struct {
 <#
 .SYNOPSIS
 
@@ -1050,7 +512,7 @@ Author: Matthew Graeber (@mattifestation)
 License: BSD 3-Clause
 Required Dependencies: None
 Optional Dependencies: field
- 
+
 .DESCRIPTION
 
 The 'struct' function facilitates the creation of structs entirely in
@@ -1135,8 +597,7 @@ New-Struct. :P
 #>
 
     [OutputType([Type])]
-    Param
-    (
+    Param (
         [Parameter(Position = 1, Mandatory = $True)]
         [ValidateScript({($_ -is [Reflection.Emit.ModuleBuilder]) -or ($_ -is [Reflection.Assembly])})]
         $Module,
@@ -1158,8 +619,7 @@ New-Struct. :P
         $ExplicitLayout
     )
 
-    if ($Module -is [Reflection.Assembly])
-    {
+    if ($Module -is [Reflection.Assembly]) {
         return ($Module.GetType($FullName))
     }
 
@@ -1169,12 +629,10 @@ New-Struct. :P
         Sealed,
         BeforeFieldInit'
 
-    if ($ExplicitLayout)
-    {
+    if ($ExplicitLayout) {
         $StructAttributes = $StructAttributes -bor [Reflection.TypeAttributes]::ExplicitLayout
     }
-    else
-    {
+    else {
         $StructAttributes = $StructAttributes -bor [Reflection.TypeAttributes]::SequentialLayout
     }
 
@@ -1187,14 +645,12 @@ New-Struct. :P
     # Sort each field according to the orders specified
     # Unfortunately, PSv2 doesn't have the luxury of the
     # hashtable [Ordered] accelerator.
-    foreach ($Field in $StructFields.Keys)
-    {
+    foreach ($Field in $StructFields.Keys) {
         $Index = $StructFields[$Field]['Position']
         $Fields[$Index] = @{FieldName = $Field; Properties = $StructFields[$Field]}
     }
 
-    foreach ($Field in $Fields)
-    {
+    foreach ($Field in $Fields) {
         $FieldName = $Field['FieldName']
         $FieldProp = $Field['Properties']
 
@@ -1204,8 +660,7 @@ New-Struct. :P
 
         $NewField = $StructBuilder.DefineField($FieldName, $Type, 'Public')
 
-        if ($MarshalAs)
-        {
+        if ($MarshalAs) {
             $UnmanagedType = $MarshalAs[0] -as ([Runtime.InteropServices.UnmanagedType])
             if ($MarshalAs[1])
             {
@@ -1217,7 +672,7 @@ New-Struct. :P
             {
                 $AttribBuilder = New-Object Reflection.Emit.CustomAttributeBuilder($ConstructorInfo, [Object[]] @($UnmanagedType))
             }
-            
+
             $NewField.SetCustomAttribute($AttribBuilder)
         }
 
@@ -1351,7 +806,7 @@ $SidNameUser = psenum $Mod Thread.SID_NAME_USE UInt32 @{
   SidTypeComputer                        = 9
 }
 
-$TokenInformationClass = psenum $Mod Thread.TOKEN_INFORMATION_CLASS UInt16 @{ 
+$TokenInformationClass = psenum $Mod Thread.TOKEN_INFORMATION_CLASS UInt16 @{
   TokenUser                             = 1
   TokenGroups                           = 2
   TokenPrivileges                       = 3
@@ -1451,17 +906,17 @@ $FunctionDefinitions = @(
     (func kernel32 CloseHandle ([bool]) @(
         [IntPtr]                                  #_In_ HANDLE hObject
     ) -SetLastError),
-    
+
     (func advapi32 ConvertSidToStringSid ([bool]) @(
         [IntPtr]                                  #_In_  PSID   Sid,
         [IntPtr].MakeByRefType()                  #_Out_ LPTSTR *StringSid
     ) -SetLastError),
-    
+
     (func kernel32 CreateToolhelp32Snapshot ([IntPtr]) @(
         [UInt32],                                 #_In_ DWORD dwFlags,
         [UInt32]                                  #_In_ DWORD th32ProcessID
     ) -SetLastError),
-    
+
     (func advapi32 GetTokenInformation ([bool]) @(
       [IntPtr],                                   #_In_      HANDLE                  TokenHandle
       [Int32],                                    #_In_      TOKEN_INFORMATION_CLASS TokenInformationClass
@@ -1483,7 +938,7 @@ $FunctionDefinitions = @(
         [bool],                                   #_In_ BOOL  bInheritHandle,
         [UInt32]                                  #_In_ DWORD dwProcessId
     ) -SetLastError),
-    
+
     (func advapi32 OpenProcessToken ([bool]) @(
       [IntPtr],                                   #_In_  HANDLE  ProcessHandle
       [UInt32],                                   #_In_  DWORD   DesiredAccess
@@ -1495,21 +950,21 @@ $FunctionDefinitions = @(
         [bool],                                    #_In_ BOOL  bInheritHandle,
         [UInt32]                                   #_In_ DWORD dwThreadId
     ) -SetLastError),
-    
+
     (func advapi32 OpenThreadToken ([bool]) @(
       [IntPtr],                                    #_In_  HANDLE  ThreadHandle
       [UInt32],                                    #_In_  DWORD   DesiredAccess
       [bool],                                      #_In_  BOOL    OpenAsSelf
       [IntPtr].MakeByRefType()                     #_Out_ PHANDLE TokenHandle
     ) -SetLastError),
-    
+
     (func kernel32 QueryFullProcessImageName ([bool]) @(
       [IntPtr]                                     #_In_    HANDLE hProcess
       [UInt32]                                     #_In_    DWORD  dwFlags,
       [System.Text.StringBuilder]                  #_Out_   LPTSTR lpExeName,
       [UInt32].MakeByRefType()                     #_Inout_ PDWORD lpdwSize
     ) -SetLastError),
-    
+
     (func kernel32 ReadProcessMemory ([Bool]) @(
         [IntPtr],                                  # _In_ HANDLE hProcess
         [IntPtr],                                  # _In_ LPCVOID lpBaseAddress
@@ -1517,22 +972,22 @@ $FunctionDefinitions = @(
         [Int],                                     # _In_ SIZE_T nSize
         [Int].MakeByRefType()                      # _Out_ SIZE_T *lpNumberOfBytesRead
     ) -SetLastError),
-    
+
     (func kernel32 TerminateThread ([bool]) @(
         [IntPtr],                                  # _InOut_ HANDLE hThread
         [UInt32]                                   # _In_ DWORD dwExitCode
     ) -SetLastError),
-    
+
     (func kernel32 Thread32First ([bool]) @(
         [IntPtr],                                  #_In_    HANDLE          hSnapshot,
         $THREADENTRY32.MakeByRefType()             #_Inout_ LPTHREADENTRY32 lpte
     ) -SetLastError)
-    
+
     (func kernel32 Thread32Next ([bool]) @(
         [IntPtr],                                  #_In_  HANDLE          hSnapshot,
         $THREADENTRY32.MakeByRefType()             #_Out_ LPTHREADENTRY32 lpte
     ) -SetLastError),
-    
+
     (func kernel32 VirtualQueryEx ([Int32]) @(
         [IntPtr],                                  #_In_     HANDLE                    hProcess,
         [IntPtr],                                  #_In_opt_ LPCVOID                   lpAddress,
@@ -1619,17 +1074,17 @@ $TOKEN_ADJUST_PRIVILEGES = 0x0020
 $TOKEN_ADJUST_GROUPS = 0x0040
 $TOKEN_ADJUST_DEFAULT = 0x0080
 $TOKEN_ADJUST_SESSIONID = 0x0100
-$TOKEN_ALL_ACCESS = $STANDARD_RIGHTS_REQUIRED -bor 
+$TOKEN_ALL_ACCESS = $STANDARD_RIGHTS_REQUIRED -bor
                     $TOKEN_ASSIGN_PRIMARY -bor
                     $TOKEN_DUPLICATE -bor
                     $TOKEN_IMPERSONATE -bor
                     $TOKEN_QUERY -bor
                     $TOKEN_QUERY_SOURCE -bor
                     $TOKEN_ADJUST_PRIVILEGES -bor
-                    $TOKEN_ADJUST_GROUPS -bor 
+                    $TOKEN_ADJUST_GROUPS -bor
                     $TOKEN_ADJUST_DEFAULT
-                    
-                    
+
+
 $UNTRUSTED_MANDATORY_LEVEL = "S-1-16-0"
 $LOW_MANDATORY_LEVEL = "S-1-16-4096"
 $MEDIUM_MANDATORY_LEVEL = "S-1-16-8192"
@@ -1672,8 +1127,8 @@ function CloseHandle
     - Thread
     - Transaction
     - Waitable timer
-    
-    The documentation for the functions that create these objects indicates that CloseHandle should be used when you are finished with the object, and what happens to pending operations on the object after the handle is closed. In general, CloseHandle invalidates the specified object handle, decrements the object's handle count, and performs object retention checks. After the last handle to an object is closed, the object is removed from the system. 
+
+    The documentation for the functions that create these objects indicates that CloseHandle should be used when you are finished with the object, and what happens to pending operations on the object after the handle is closed. In general, CloseHandle invalidates the specified object handle, decrements the object's handle count, and performs object retention checks. After the last handle to an object is closed, the object is removed from the system.
 
     .PARAMETER Handle
 
@@ -1682,7 +1137,7 @@ function CloseHandle
     .NOTES
 
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/ms724211(v=vs.85).aspx
@@ -1694,18 +1149,18 @@ function CloseHandle
     (
         [Parameter(Mandatory = $true)]
         [IntPtr]
-        $Handle    
+        $Handle
     )
-    
+
     <#
     (func kernel32 CloseHandle ([bool]) @(
         [IntPtr]                                  #_In_ HANDLE hObject
     ) -SetLastError)
     #>
-    
+
     $Success = $Kernel32::CloseHandle($Handle); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if(-not $Success) 
+    if(-not $Success)
     {
         Write-Debug "Close Handle Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
@@ -1721,7 +1176,7 @@ function ConvertSidToStringSid
     .DESCRIPTION
 
     The ConvertSidToStringSid function uses the standard S-R-I-S-S… format for SID strings.
-    
+
     .PARAMETER SidPointer
 
     A pointer to the SID structure to be converted.
@@ -1729,7 +1184,7 @@ function ConvertSidToStringSid
     .NOTES
 
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/aa376399(v=vs.85).aspx
@@ -1741,24 +1196,24 @@ function ConvertSidToStringSid
     (
         [Parameter(Mandatory = $true)]
         [IntPtr]
-        $SidPointer    
+        $SidPointer
     )
-    
+
     <#
     (func advapi32 ConvertSidToStringSid ([bool]) @(
         [IntPtr]                                  #_In_  PSID   Sid,
         [IntPtr].MakeByRefType()                  #_Out_ LPTSTR *StringSid
     ) -SetLastError)
     #>
-    
+
     $StringPtr = [IntPtr]::Zero
     $Success = $Advapi32::ConvertSidToStringSid($SidPointer, [ref]$StringPtr); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if(-not $Success) 
+    if(-not $Success)
     {
         Write-Debug "ConvertSidToStringSid Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
-    
+
     Write-Output ([System.Runtime.InteropServices.Marshal]::PtrToStringAuto($StringPtr))
 }
 
@@ -1774,11 +1229,11 @@ function CreateToolhelp32Snapshot
     .PARAMETER ProcessId
 
     .PARAMETER Flags
-    
+
     .NOTES
 
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     .EXAMPLE
@@ -1789,26 +1244,26 @@ function CreateToolhelp32Snapshot
         [Parameter(Mandatory = $true)]
         [UInt32]
         $ProcessId,
-        
+
         [Parameter(Mandatory = $true)]
         [UInt32]
         $Flags
     )
-    
+
     <#
     (func kernel32 CreateToolhelp32Snapshot ([IntPtr]) @(
         [UInt32],                                 #_In_ DWORD dwFlags,
         [UInt32]                                  #_In_ DWORD th32ProcessID
     ) -SetLastError)
     #>
-    
+
     $hSnapshot = $Kernel32::CreateToolhelp32Snapshot($Flags, $ProcessId); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if(-not $hSnapshot) 
+    if(-not $hSnapshot)
     {
         Write-Debug "CreateToolhelp32Snapshot Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
-    
+
     Write-Output $hSnapshot
 }
 
@@ -1826,7 +1281,7 @@ function GetTokenInformation
     .NOTES
 
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     .EXAMPLE
@@ -1837,12 +1292,12 @@ function GetTokenInformation
         [Parameter(Mandatory = $true)]
         [IntPtr]
         $TokenHandle,
-        
+
         [Parameter(Mandatory = $true)]
-        $TokenInformationClass 
+        $TokenInformationClass
     )
-    
-    <# 
+
+    <#
     (func advapi32 GetTokenInformation ([bool]) @(
       [IntPtr],                                   #_In_      HANDLE                  TokenHandle
       [Int32],                                    #_In_      TOKEN_INFORMATION_CLASS TokenInformationClass
@@ -1851,21 +1306,21 @@ function GetTokenInformation
       [UInt32].MakeByRefType()                    #_Out_     PDWORD                  ReturnLength
     ) -SetLastError)
     #>
-    
+
     # initial query to determine the necessary buffer size
     $TokenPtrSize = 0
     $Success = $Advapi32::GetTokenInformation($TokenHandle, $TokenInformationClass, 0, $TokenPtrSize, [ref]$TokenPtrSize)
     [IntPtr]$TokenPtr = [System.Runtime.InteropServices.Marshal]::AllocHGlobal($TokenPtrSize)
-    
+
     # retrieve the proper buffer value
     $Success = $Advapi32::GetTokenInformation($TokenHandle, $TokenInformationClass, $TokenPtr, $TokenPtrSize, [ref]$TokenPtrSize); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
-    
+
     if($Success)
     {
         switch($TokenInformationClass)
         {
             1 # TokenUser
-            {    
+            {
                 $TokenUser = $TokenPtr -as $TOKEN_USER
                 ConvertSidToStringSid -SidPointer $TokenUser.User.Sid
             }
@@ -1873,14 +1328,14 @@ function GetTokenInformation
             {
                 # query the process token with the TOKEN_INFORMATION_CLASS = 3 enum to retrieve a TOKEN_PRIVILEGES structure
                 $TokenPrivileges = $TokenPtr -as $TOKEN_PRIVILEGES
-                
+
                 $sb = New-Object System.Text.StringBuilder
-                
-                for($i=0; $i -lt $TokenPrivileges.PrivilegeCount; $i++) 
+
+                for($i=0; $i -lt $TokenPrivileges.PrivilegeCount; $i++)
                 {
                     if((($TokenPrivileges.Privileges[$i].Attributes -as $LuidAttributes) -band $LuidAttributes::SE_PRIVILEGE_ENABLED) -eq $LuidAttributes::SE_PRIVILEGE_ENABLED)
                     {
-                       $sb.Append(", $($TokenPrivileges.Privileges[$i].Luid.LowPart.ToString())") | Out-Null  
+                       $sb.Append(", $($TokenPrivileges.Privileges[$i].Luid.LowPart.ToString())") | Out-Null
                     }
                 }
                 Write-Output $sb.ToString().TrimStart(', ')
@@ -1892,7 +1347,7 @@ function GetTokenInformation
             }
             22 # TokenAccessInformation
             {
-            
+
             }
             25 # TokenIntegrityLevel
             {
@@ -1938,14 +1393,14 @@ function GetTokenInformation
     else
     {
         Write-Debug "GetTokenInformation Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
-    }        
+    }
     try
     {
         [System.Runtime.InteropServices.Marshal]::FreeHGlobal($TokenPtr)
     }
     catch
     {
-    
+
     }
 }
 
@@ -1963,7 +1418,7 @@ function NtQueryInformationThread
     .NOTES
 
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     .EXAMPLE
@@ -1973,9 +1428,9 @@ function NtQueryInformationThread
     (
         [Parameter(Mandatory = $true)]
         [IntPtr]
-        $ThreadHandle  
+        $ThreadHandle
     )
-    
+
     <#
     (func ntdll NtQueryInformationThread ([Int32]) @(
         [IntPtr],                                 #_In_      HANDLE          ThreadHandle,
@@ -1985,16 +1440,16 @@ function NtQueryInformationThread
         [IntPtr]                                  #_Out_opt_ PULONG          ReturnLength
     ))
     #>
-    
+
     $buf = [System.Runtime.InteropServices.Marshal]::AllocHGlobal([IntPtr]::Size)
 
     $Success = $Ntdll::NtQueryInformationThread($ThreadHandle, 9, $buf, [IntPtr]::Size, [IntPtr]::Zero); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if(-not $Success) 
+    if(-not $Success)
     {
         Write-Debug "NtQueryInformationThread Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
-    
+
     Write-Output ([System.Runtime.InteropServices.Marshal]::ReadIntPtr($buf))
 }
 
@@ -2026,13 +1481,13 @@ function OpenProcess
     If this value is TRUE, processes created by this process will inherit the handle. Otherwise, the processes do not inherit this handle.
 
     .NOTES
-    
+
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/ms684320(v=vs.85).aspx
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/ms684880(v=vs.85).aspx
@@ -2045,16 +1500,16 @@ function OpenProcess
         [Parameter(Mandatory = $true)]
         [UInt32]
         $ProcessId,
-        
+
         [Parameter(Mandatory = $true)]
         [UInt32]
         $DesiredAccess,
-        
+
         [Parameter()]
         [bool]
         $InheritHandle = $false
     )
-    
+
     <#
     (func kernel32 OpenProcess ([IntPtr]) @(
         [UInt32],                                 #_In_ DWORD dwDesiredAccess,
@@ -2062,19 +1517,19 @@ function OpenProcess
         [UInt32]                                  #_In_ DWORD dwProcessId
     ) -SetLastError)
     #>
-    
+
     $hProcess = $Kernel32::OpenProcess($DesiredAccess, $InheritHandle, $ProcessId); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if($hProcess -eq 0) 
+    if($hProcess -eq 0)
     {
         Write-Debug "OpenProcess Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
-    
+
     Write-Output $hProcess
 }
 
 function OpenProcessToken
-{ 
+{
     <#
     .SYNOPSIS
 
@@ -2090,13 +1545,13 @@ function OpenProcessToken
     For a list of access rights for access tokens, see Access Rights for Access-Token Objects.
 
     .NOTES
-    
+
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/aa379295(v=vs.85).aspx
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/aa374905(v=vs.85).aspx
@@ -2109,28 +1564,28 @@ function OpenProcessToken
         [Parameter(Mandatory = $true)]
         [IntPtr]
         $ProcessHandle,
-        
+
         [Parameter(Mandatory = $true)]
         [UInt32]
-        $DesiredAccess  
+        $DesiredAccess
     )
-    
-    <#   
+
+    <#
     (func advapi32 OpenProcessToken ([bool]) @(
       [IntPtr],                                   #_In_  HANDLE  ProcessHandle
       [UInt32],                                   #_In_  DWORD   DesiredAccess
       [IntPtr].MakeByRefType()                    #_Out_ PHANDLE TokenHandle
     ) -SetLastError)
     #>
-    
+
     $hToken = [IntPtr]::Zero
     $Success = $Advapi32::OpenProcessToken($ProcessHandle, $DesiredAccess, [ref]$hToken); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if(-not $Success) 
+    if(-not $Success)
     {
         Write-Debug "OpenProcessToken Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
-    
+
     Write-Output $hToken
 }
 
@@ -2158,15 +1613,15 @@ function OpenThread
     .PARAMETER InheritHandle
 
     If this value is TRUE, processes created by this process will inherit the handle. Otherwise, the processes do not inherit this handle.
-    
+
     .NOTES
-    
+
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/ms684335(v=vs.85).aspx
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/ms686769(v=vs.85).aspx
@@ -2179,16 +1634,16 @@ function OpenThread
         [Parameter(Mandatory = $true)]
         [UInt32]
         $ThreadId,
-        
+
         [Parameter(Mandatory = $true)]
         [UInt32]
         $DesiredAccess,
-        
+
         [Parameter()]
         [bool]
         $InheritHandle = $false
     )
-    
+
     <#
     (func kernel32 OpenThread ([IntPtr]) @(
         [UInt32],                                  #_In_ DWORD dwDesiredAccess,
@@ -2196,14 +1651,14 @@ function OpenThread
         [UInt32]                                   #_In_ DWORD dwThreadId
     ) -SetLastError)
     #>
-    
+
     $hThread = $Kernel32::OpenThread($DesiredAccess, $InheritHandle, $ThreadId); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if($hThread -eq 0) 
+    if($hThread -eq 0)
     {
         Write-Debug "OpenThread Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
-    
+
     Write-Output $hThread
 }
 
@@ -2234,13 +1689,13 @@ function OpenThreadToken
     The OpenAsSelf parameter allows the caller of this function to open the access token of a specified thread when the caller is impersonating a token at SecurityIdentification level. Without this parameter, the calling thread cannot open the access token on the specified thread because it is impossible to open executive-level objects by using the SecurityIdentification impersonation level.
 
     .NOTES
-    
+
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
-    
+
     https://msdn.microsoft.com/en-us/library/windows/desktop/aa379296(v=vs.85).aspx
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/aa374905(v=vs.85).aspx
@@ -2253,17 +1708,17 @@ function OpenThreadToken
         [Parameter(Mandatory = $true)]
         [IntPtr]
         $ThreadHandle,
-        
+
         [Parameter(Mandatory = $true)]
         [UInt32]
         $DesiredAccess,
-        
+
         [Parameter()]
         [bool]
-        $OpenAsSelf = $false   
+        $OpenAsSelf = $false
     )
-    
-    <# 
+
+    <#
     (func advapi32 OpenThreadToken ([bool]) @(
       [IntPtr],                                    #_In_  HANDLE  ThreadHandle
       [UInt32],                                    #_In_  DWORD   DesiredAccess
@@ -2271,16 +1726,16 @@ function OpenThreadToken
       [IntPtr].MakeByRefType()                     #_Out_ PHANDLE TokenHandle
     ) -SetLastError)
     #>
-    
+
     $hToken = [IntPtr]::Zero
     $Success = $Advapi32::OpenThreadToken($ThreadHandle, $DesiredAccess, $OpenAsSelf, [ref]$hToken); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if(-not $Success) 
+    if(-not $Success)
     {
         Write-Debug "OpenThreadToken Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
         throw "OpenThreadToken Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
-    
+
     Write-Output $hToken
 }
 
@@ -2302,9 +1757,9 @@ function QueryFullProcessImageName
     0x01 - The name should use the native system path format.
 
     .NOTES
-    
+
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/ms684919(v=vs.85).aspx
@@ -2317,22 +1772,22 @@ function QueryFullProcessImageName
         [Parameter(Mandatory = $true)]
         [IntPtr]
         $ProcessHandle,
-        
+
         [Parameter()]
         [UInt32]
         $Flags = 0
     )
-    
+
     $capacity = 2048
     $sb = New-Object -TypeName System.Text.StringBuilder($capacity)
 
     $Success = $Kernel32::QueryFullProcessImageName($ProcessHandle, $Flags, $sb, [ref]$capacity); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if(-not $Success) 
+    if(-not $Success)
     {
         Write-Debug "QueryFullProcessImageName Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
-    
+
     Write-Output $sb.ToString()
 }
 
@@ -2362,13 +1817,13 @@ function ReadProcessMemory
     The number of bytes to be read from the specified process.
 
     .NOTES
-    
+
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/ms680553(v=vs.85).aspx
-    
+
     .EXAMPLE
     #>
 
@@ -2377,16 +1832,16 @@ function ReadProcessMemory
         [Parameter(Mandatory = $true)]
         [IntPtr]
         $ProcessHandle,
-        
+
         [Parameter(Mandatory = $true)]
         [IntPtr]
         $BaseAddress,
-        
+
         [Parameter(Mandatory = $true)]
         [Int]
-        $Size    
+        $Size
     )
-    
+
     <#
     (func kernel32 ReadProcessMemory ([Bool]) @(
         [IntPtr],                                  # _In_ HANDLE hProcess
@@ -2394,21 +1849,21 @@ function ReadProcessMemory
         [Byte[]],                                  # _Out_ LPVOID  lpBuffer
         [Int],                                     # _In_ SIZE_T nSize
         [Int].MakeByRefType()                      # _Out_ SIZE_T *lpNumberOfBytesRead
-    ) -SetLastError) # MSDN states to call GetLastError if the return value is false. 
+    ) -SetLastError) # MSDN states to call GetLastError if the return value is false.
     #>
-    
+
     $buf = New-Object byte[]($Size)
     [Int32]$NumberOfBytesRead = 0
-    
+
     $Success = $Kernel32::ReadProcessMemory($ProcessHandle, $BaseAddress, $buf, $buf.Length, [ref]$NumberOfBytesRead); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if(-not $Success) 
+    if(-not $Success)
     {
         Write-Debug "ReadProcessMemory Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
-    
+
     Write-Output $buf
-}    
+}
 
 function TerminateThread
 {
@@ -2425,20 +1880,20 @@ function TerminateThread
 
     A handle to the thread to be terminated.
 
-    The handle must have the THREAD_TERMINATE access right. 
-    
+    The handle must have the THREAD_TERMINATE access right.
+
     .PARAMETER ExitCode
-    
+
     The exit code for the thread.
 
     .NOTES
-    
+
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/ms686717(v=vs.85).aspx
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/ms686769(v=vs.85).aspx
@@ -2451,22 +1906,22 @@ function TerminateThread
         [Parameter(Mandatory = $true)]
         [IntPtr]
         $ThreadHandle,
-        
+
         [Parameter()]
         [UInt32]
         $ExitCode = 0
     )
-    
+
     <#
     (func kernel32 TerminateThread ([bool]) @(
         [IntPtr],                                  # _InOut_ HANDLE hThread
         [UInt32]                                   # _In_ DWORD dwExitCode
     ) -SetLastError)
     #>
-    
+
     $Success = $Kernel32::TerminateThread($ThreadHandle, $ExitCode); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if(-not $Success) 
+    if(-not $Success)
     {
         Write-Debug "TerminateThread Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
@@ -2484,9 +1939,9 @@ function Thread32First
     A handle to the snapshot returned from a previous call to the CreateToolhelp32Snapshot function.
 
     .NOTES
-    
+
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/ms686728(v=vs.85).aspx
@@ -2500,26 +1955,26 @@ function Thread32First
         [IntPtr]
         $SnapshotHandle
     )
-    
+
     <#
     (func kernel32 Thread32First ([bool]) @(
         [IntPtr],                                  #_In_    HANDLE          hSnapshot,
         $THREADENTRY32.MakeByRefType()             #_Inout_ LPTHREADENTRY32 lpte
     ) -SetLastError)
     #>
-    
+
     $Thread = [Activator]::CreateInstance($THREADENTRY32)
     $Thread.dwSize = $THREADENTRY32::GetSize()
 
     $Success = $Kernel32::Thread32First($hSnapshot, [Ref]$Thread); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if(-not $Success) 
+    if(-not $Success)
     {
         Write-Debug "Thread32First Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
     }
-    
+
     Write-Output $Thread
-}    
+}
 
 function VirtualQueryEx
 {
@@ -2535,11 +1990,11 @@ function VirtualQueryEx
     .PARAMETER BaseAddress
 
     The base address of the region of pages to be queried. This value is rounded down to the next page boundary.
-    
+
     .NOTES
-    
+
     Author - Jared Atkinson (@jaredcatkinson)
-    
+
     .LINK
 
     https://msdn.microsoft.com/en-us/library/windows/desktop/aa366907(v=vs.85).aspx
@@ -2552,13 +2007,13 @@ function VirtualQueryEx
         [Parameter(Mandatory = $true)]
         [IntPtr]
         $ProcessHandle,
-        
+
         [Parameter(Mandatory = $true)]
         [IntPtr]
         $BaseAddress
     )
-    
-    <#  
+
+    <#
     (func kernel32 VirtualQueryEx ([Int32]) @(
         [IntPtr],                                  #_In_     HANDLE                    hProcess,
         [IntPtr],                                  #_In_opt_ LPCVOID                   lpAddress,
@@ -2566,17 +2021,17 @@ function VirtualQueryEx
         [UInt32]                                   #_In_     SIZE_T                    dwLength
     ) -SetLastError)
     #>
-    
+
     $memory_basic_info = [Activator]::CreateInstance($MEMORYBASICINFORMATION)
     $Success = $Kernel32::VirtualQueryEx($ProcessHandle, $BaseAddress, [Ref]$memory_basic_info, $MEMORYBASICINFORMATION::GetSize()); $LastError = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
 
-    if(-not $Success) 
+    if(-not $Success)
     {
         Write-Debug "VirtualQueryEx Error: $(([ComponentModel.Win32Exception] $LastError).Message)"
         #Write-Host "ProcessHandle: $($ProcessHandle)"
         #Write-Host "BaseAddress: $($BaseAddress)"
     }
-    
+
     Write-Output $memory_basic_info
 }
 

@@ -14,12 +14,33 @@ Description = 'PowerShell module for data collection, incident response, hunting
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
+    # Volatile information functions
     'Get-InjectedThread',
     'Get-NamedPipe',
     'Measure-CharacterFrequency',
     'Measure-DamerauLevenshteinDistance',
     'Measure-VectorSimilarity',
-    'Stop-Thread'
+    'Stop-Thread',
+    # Directory Service functions
+    'Get-DSForest',
+    'Get-DSDirectoryEntry',
+    'Get-DSDirectorySearcher',
+    'Get-DSComputer',
+    'Get-DSDomain',
+    'Get-DSGpo',
+    'Get-DSUser',
+    'Get-DSGroup'
+    'Get-DSReplicationAttribute',
+    'Get-DSGroupMember',
+    'Get-DSOU',
+    'Get-DSTrust',
+    'Get-DSObjectAcl',
+    # Eventlog functions
+    'Get-EventPsEngineState',
+    'Get-EventPsPipeline',
+    'Get-EventPsIPC',
+    'Get-EventPsScriptBlock',
+    'Get-WinEventBaseXPathFilter'
 )
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
