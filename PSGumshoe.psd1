@@ -19,7 +19,20 @@ FunctionsToExport = @(
     'Measure-CharacterFrequency',
     'Measure-DamerauLevenshteinDistance',
     'Measure-VectorSimilarity',
-    'Stop-Thread'
+    'Stop-Thread',
+    'Get-DSForest',
+    'Get-DSDirectoryEntry',
+    'Get-DSDirectorySearcher',
+    'Get-DSComputer',
+    'Get-DSDomain',
+    'Get-DSGpo',
+    'Get-DSUser',
+    'Get-DSGroup'
+    'Get-DSReplicationAttribute',
+    'Get-DSGroupMember',
+    'Get-DSOU',
+    'Get-DSTrust',
+    'Get-DSObjectAcl'
 )
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
