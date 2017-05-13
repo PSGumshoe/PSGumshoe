@@ -14,12 +14,14 @@ Description = 'PowerShell module for data collection, incident response, hunting
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
+    # Volatile information functions
     'Get-InjectedThread',
     'Get-NamedPipe',
     'Measure-CharacterFrequency',
     'Measure-DamerauLevenshteinDistance',
     'Measure-VectorSimilarity',
     'Stop-Thread',
+    # Directory Service functions
     'Get-DSForest',
     'Get-DSDirectoryEntry',
     'Get-DSDirectorySearcher',
@@ -33,6 +35,7 @@ FunctionsToExport = @(
     'Get-DSOU',
     'Get-DSTrust',
     'Get-DSObjectAcl',
+    # Eventlog functions
     'Get-EventPsEngineState',
     'Get-EventPsPipeline',
     'Get-EventPsIPC',
