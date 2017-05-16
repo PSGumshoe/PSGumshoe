@@ -1,7 +1,7 @@
 function Get-EventDNSClientDomains {
     <#
     .SYNOPSIS
-    Process DNS Requests from the DNS-Client Windows Event Log and compare against top 5000 domains
+        Process DNS Requests from the DNS-Client Windows Event Log and compare against top 5000 domains
   
     .EXAMPLE
         PS> Get-EventDNSClientDomains  
@@ -15,14 +15,6 @@ function Get-EventDNSClientDomains {
 
         PS> Get-EventDNSClientDomains -all $true
         -- Output all unique domains from DNS Client Events
-
-    .INPUT PARAMETERS
-        - all 
-          Output all unique domains from DNS Client events
-        - strict 
-          Strict comparison of looks up to Alexa 5000; domain and subdomain must match exactly
-        - whiteList
-          File containing a list of domains to ignore; this might include internal company domains not ever on public domain list
 
     .NOTES
         To enable DNS Client Event Auditing:
