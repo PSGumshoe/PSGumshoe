@@ -37,6 +37,29 @@
 . $PSScriptRoot\EventLog\Get-EventPsPipeline.ps1
 . $PSScriptRoot\EventLog\Get-EventPsScriptBlock.ps1
 . $PSScriptRoot\EventLog\Get-WinEventBaseXPathFilter.ps1
+. $PSScriptRoot\EventLog\ConvertFrom-SysmonEventLogRecord.ps1
+. $PSScriptRoot\EventLog\Get-SysmonAccessProcess.ps1
+. $PSScriptRoot\EventLog\Get-SysmonConfigChange.ps1
+. $PSScriptRoot\EventLog\Get-SysmonConnectNamedPipe.ps1
+. $PSScriptRoot\EventLog\Get-SysmonCreateNamedPipe.ps1
+. $PSScriptRoot\EventLog\Get-SysmonCreateRemoteThreadEvent.ps1
+. $PSScriptRoot\EventLog\Get-SysmonDriverLoadEvent.ps1
+. $PSScriptRoot\EventLog\Get-SysmonFileCreateEvent.ps1
+. $PSScriptRoot\EventLog\Get-SysmonFileStareamHash.ps1
+. $PSScriptRoot\EventLog\Get-SysmonFileTime.ps1
+. $PSScriptRoot\EventLog\Get-SysmonImageLoadEvent.ps1
+. $PSScriptRoot\EventLog\Get-SysmonNetworkConnect .ps1
+. $PSScriptRoot\EventLog\Get-SysmonProcessCreateEvent.ps1
+. $PSScriptRoot\EventLog\Get-SysmonProcessTerminateEvent.ps1
+. $PSScriptRoot\EventLog\Get-SysmonRawAccessRead .ps1
+. $PSScriptRoot\EventLog\Get-SysmonRegistryKey.ps1
+. $PSScriptRoot\EventLog\Get-SysmonRegistryRename.ps1
+. $PSScriptRoot\EventLog\Get-SysmonRegistrySetValue.ps1
+. $PSScriptRoot\EventLog\Get-SysmonServiceStateChange.ps1
+. $PSScriptRoot\EventLog\Get-SysmonWmiBinding.ps1
+. $PSScriptRoot\EventLog\Get-SysmonWmiConsumer.ps1
+. $PSScriptRoot\EventLog\Get-SysmonWmiFilter.ps1
+. $PSScriptRoot\EventLog\Search-SysmonEvent.ps1
 
 #region PSReflect
 
