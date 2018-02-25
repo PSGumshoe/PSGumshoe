@@ -48,10 +48,10 @@
 . $PSScriptRoot\EventLog\Get-SysmonFileStareamHash.ps1
 . $PSScriptRoot\EventLog\Get-SysmonFileTime.ps1
 . $PSScriptRoot\EventLog\Get-SysmonImageLoadEvent.ps1
-. $PSScriptRoot\EventLog\Get-SysmonNetworkConnect .ps1
+. $PSScriptRoot\EventLog\Get-SysmonNetworkConnect.ps1
 . $PSScriptRoot\EventLog\Get-SysmonProcessCreateEvent.ps1
 . $PSScriptRoot\EventLog\Get-SysmonProcessTerminateEvent.ps1
-. $PSScriptRoot\EventLog\Get-SysmonRawAccessRead .ps1
+. $PSScriptRoot\EventLog\Get-SysmonRawAccessRead.ps1
 . $PSScriptRoot\EventLog\Get-SysmonRegistryKey.ps1
 . $PSScriptRoot\EventLog\Get-SysmonRegistryRename.ps1
 . $PSScriptRoot\EventLog\Get-SysmonRegistrySetValue.ps1
@@ -60,6 +60,7 @@
 . $PSScriptRoot\EventLog\Get-SysmonWmiConsumer.ps1
 . $PSScriptRoot\EventLog\Get-SysmonWmiFilter.ps1
 . $PSScriptRoot\EventLog\Search-SysmonEvent.ps1
+
 
 #region PSReflect
 
