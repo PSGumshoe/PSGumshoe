@@ -1,18 +1,25 @@
+
 function Get-WinEventBaseXPathFilter {
     <#
-    .Synopsis
-    Generate xpath filters for fields on a specified Event Log Entry.
+    .SYNOPSIS
+        Generate xpath filters for fields on a specified Event Log Entry.
     .DESCRIPTION
-    Parses Event Log Entries to make usable Windows Event log
-    filtering xpath for Windows Event Filters and Windows Eventlog Forwarding
+        Parses Event Log Entries to make usable Windows Event log
+        filtering xpath for Windows Event Filters and Windows Eventlog Forwarding
     .EXAMPLE
-    PS C:\> Get-WinEventBaseXPathFilter -EventId 4624 -LogName security
+        PS C:\> Get-WinEventBaseXPathFilter -EventId 4624 -LogName security
 
-    Parses the first event with id 4624 in the security eventlog.
-    .NOTE
-    Port of script Written 5/22/2015 – Kurt Falde
+        Parses the first event with id 4624 in the security eventlog.
+    .INPUTS
+        Inputs (if any)
+    .OUTPUTS
+        Output (if any)
+    .NOTES
+        Port of script Written 5/22/2015 – Kurt Falde
+        Modified from original to have more accurate filtering on elements with attributes, plus other minor improvements.
     #>
     [CmdletBinding(DefaultParameterSetName='EventID')]
+    [OutputType([String])]
     Param (
         # Event ID to create filter on. Will select first event found in the specified log
         [Parameter(Mandatory=$true,
@@ -45,7 +52,6 @@ function Get-WinEventBaseXPathFilter {
     }
     Process
     {
-
         $xpath
         $EventToParse = Get-WinEvent -LogName "$($LogName)" -FilterXPath "$xpath" -ErrorAction stop -MaxEvents 1
         [xml]$EventToParsexml = $EventToParse.ToXml()
@@ -62,33 +68,29 @@ function Get-WinEventBaseXPathFilter {
                 $Nname = $node.Node.Name
                 #write-host $Nname
                 if($node.node.Parentnode.ParentNode.Name -eq "Event"){
-                    write-host "*[$($node.node.Parentnode.name)[($Nname=$Ntext)]]"
+                    "*[$($node.node.Parentnode.name)[($Nname=$Ntext)]]"
                 }
                 if($node.node.Parentnode.ParentNode.ParentNode.Name -eq "Event"){
-                    write-host "*[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[($Nname=$Ntext)]]]"
+                    "*[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[($Nname=$Ntext)]]]"
                 }
                 if($node.node.Parentnode.ParentNode.ParentNode.Parentnode.Name -eq "Event"){
-                    write-host "*[$($node.node.ParentNode.Parentnode.Parentnode.name)[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[($Nname=$Ntext)]]]]"
+                    "*[$($node.node.ParentNode.Parentnode.Parentnode.name)[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[($Nname=$Ntext)]]]]"
                 }
             }
 
             #Parses nodes that are not empty, not null and have attributes
             if (($node.node.IsEmpty -eq $false) -and ($node.node.'#text' -ne $null) -and ($node.node.HasAttributes -eq $true)){
                 $Ntext = $node.Node.'#text'
-                #write-Host $Ntext
                 $Ntext = $Ntext.Replace("`n", "&#xD;&#xA;").Replace("`t", "&#x09;")
-                #write-host $Ntext
                 $Nname = $node.Node.Name
-                #write-host $Nname
-                # *[EventData[Data[@Name='Properties'] and (Data='%%7688&#x
                 if($node.node.Parentnode.ParentNode.Name -eq "Event"){
-                    write-host "*[$($node.node.Parentnode.name)[$($node.node.LocalName)[@Name='$Nname'] and ($($node.node.LocalName)='$Ntext')]]"
+                    "*[$($node.node.Parentnode.name)[$($node.node.LocalName)[@Name='$Nname']='$Ntext']]"
                 }
                 if($node.node.Parentnode.ParentNode.ParentNode.Name -eq "Event"){
-                    write-host "*[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[($Nname=$Ntext)]]]"
+                    "*[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[($Nname=$Ntext)]]]"
                 }
                 if($node.node.Parentnode.ParentNode.ParentNode.Parentnode.Name -eq "Event"){
-                    write-host "*[$($node.node.ParentNode.Parentnode.Parentnode.name)[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[($Nname=$Ntext)]]]]"
+                    "*[$($node.node.ParentNode.Parentnode.Parentnode.name)[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[($Nname=$Ntext)]]]]"
                 }
                 }
 
@@ -100,21 +102,21 @@ function Get-WinEventBaseXPathFilter {
                     $AttrName = $Attribute.Name
                     $AttrText = $Attribute.'#text'
                     $AttributeText += "@$AttrName='$AttrText' and "
-                    #write-host $AttributeText
                 }
                 $AttributeText = $AttributeText.TrimEnd(" and ")
                 $Nname = $node.Node.Name
                 if($node.node.Parentnode.ParentNode.Name -eq "Event"){
-                    write-host "*[$($node.node.Parentnode.name)[$($node.node.LocalName)[$AttributeText]]"
+                    "*[$($node.node.Parentnode.name)[$($node.node.LocalName)[$AttributeText]]"
                 }
                 if($node.node.Parentnode.ParentNode.ParentNode.Name -eq "Event"){
-                    write-host "*[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[$AttributeText]]]"
+                    "*[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[$AttributeText]]]"
                 }
                 if($node.node.Parentnode.ParentNode.ParentNode.Parentnode.Name -eq "Event"){
-                    write-host "*[$($node.node.ParentNode.Parentnode.Parentnode.name)[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[$AttributeText]]]]"
+                    "*[$($node.node.ParentNode.Parentnode.Parentnode.name)[$($node.node.ParentNode.Parentnode.name)[$($node.node.parentnode.name)[$AttributeText]]]]"
                 }
-                }
+            }
         }
+        $StringOut
     }
     End { }
 }
