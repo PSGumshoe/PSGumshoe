@@ -40,7 +40,28 @@ FunctionsToExport = @(
     'Get-EventPsPipeline',
     'Get-EventPsIPC',
     'Get-EventPsScriptBlock',
-    'Get-WinEventBaseXPathFilter'
+    'Get-WinEventBaseXPathFilter',
+    'Get-SysmonAccessProcess',
+    'Get-SysmonConfigChange',
+    'Get-SysmonConnectNamedPipe',
+    'Get-SysmonCreateNamedPipe',
+    'Get-SysmonCreateRemoteThreadEvent',
+    'Get-SysmonDriverLoadEvent',
+    'Get-SysmonFileCreateEvent',
+    'Get-SysmonFileStareamHash',
+    'Get-SysmonFileTime',
+    'Get-SysmonImageLoadEvent',
+    'Get-SysmonNetworkConnect ',
+    'Get-SysmonProcessCreateEvent',
+    'Get-SysmonProcessTerminateEvent',
+    'Get-SysmonRawAccessRead ',
+    'Get-SysmonRegistryKey',
+    'Get-SysmonRegistryRename',
+    'Get-SysmonRegistrySetValue',
+    'Get-SysmonServiceStateChange',
+    'Get-SysmonWmiBinding',
+    'Get-SysmonWmiConsumer',
+    'Get-SysmonWmiFilter'
 )
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
