@@ -117,7 +117,7 @@ function Get-SysmonProcessCreateEvent {
         [Parameter(Mandatory = $false,
         ValueFromPipelineByPropertyName = $true,
         ParameterSetName = 'File')]
-        [string]
+        [string[]]
         $Path,
 
         # Gets events from the event logs on the specified computer. Type the NetBIOS name, an Internet Protocol (IP) address, or the fully qualified domain name of the computer.

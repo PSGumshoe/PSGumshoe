@@ -20,7 +20,7 @@ function Search-SysmonEvent {
         $ParamHash,
 
         # Sysmon Event Id to filter on
-        [int]
+        [int[]]
         $EventId,
 
         # Record type to output.
@@ -35,11 +35,6 @@ function Search-SysmonEvent {
         $Params = $ParamHash.keys
         $CommonParams = ([System.Management.Automation.Cmdlet]::CommonParameters) + @('Credential', 'ComputerName', 'MaxEvents', 'StartTime', 'EndTime', 'Path', 'ChangeLogic')
 
-        # If Path is provided ensure we only resolve to first file and prevent a wildcard to be given.
-        if ($Params -contains 'Path') {
-            $FullPath = (Resolve-Path -Path $ParamHash['Path']).Path
-        }
-
         $FinalParams = @()
         foreach ($p in $Params) {
             if ($p -notin $CommonParams) {
@@ -47,7 +42,21 @@ function Search-SysmonEvent {
             }
         }
         # Build filters based on options available.
-        $filter = "`n*[System/Provider[@Name='microsoft-windows-sysmon'] and (System/EventID=$($EventId))] "
+        if ($EventId.Length -gt 1) {
+            $IdFilterCount = 0
+            foreach($id in $EventId) {
+                if ($IdFilterCount -eq 0) {
+                   $idFilter =  "(System/EventID=$($id))"
+                } else {
+                    $idFilter += "or (System/EventID=$($id))"
+                }
+                $IdFilterCount++
+            }
+            $filter = "`n*[System/Provider[@Name='microsoft-windows-sysmon'] and ($($idFilter))] "
+        } else {
+            $filter = "`n*[System/Provider[@Name='microsoft-windows-sysmon'] and (System/EventID=$($EventId))] "
+        }
+
 
         # Manage change in Logic
         $logicOperator = 'and'
@@ -61,7 +70,6 @@ function Search-SysmonEvent {
                $FieldValue = $ParamHash["$($param)"]
                foreach($val in $FieldValue) {
                    if ($FilterCount -gt 0) {
-                       Write-Verbose -Message "Adding filter for $val"
                        $filter = $filter + "`n $( $logicOperator ) *[EventData[Data[@Name='$($Param)']='$($val)']]"
                    } else {
                        $filter = $filter + "`n and (*[EventData[Data[@Name='$($Param)']='$($val)']]"
@@ -84,18 +92,28 @@ function Search-SysmonEvent {
         }
 
         # Concatenate all the filters in to one single XML Filter.
-        if ($FilterCount -eq 0) {
-            if ($Params -contains 'Path') {
-                $BaseFilter = "<QueryList><Query Id='0' Path='file://$($FullPath)'>`n<Select>$($filter)`n</Select></Query></QueryList>"
-            } else {
-                $BaseFilter = "<QueryList><Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter)`n</Select></Query></QueryList>"
+        if ($Params -contains 'Path') {
+            # Initiate variable that will be used for the Query Id for each in the QueryList.
+            $QueryId = 0
+            $Querys = ''
+
+            # Resolve all paths provided and process each.
+            (Resolve-Path -Path $ParamHash['Path']).Path | ForEach-Object {
+                if ($FilterCount -eq 0) {
+                    $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($filter)`n</Select>`n</Query>"
+                } else {
+                    $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($filter))`n</Select>`n</Query>"
+                }
+                $QueryId++
             }
+            $BaseFilter = "<QueryList>`n$($Querys)`n</QueryList>"
         } else {
-            if ($Params -contains 'Path') {
-                $BaseFilter = "<QueryList><Query Id='0' Path='file://$($FullPath)'>`n<Select>$($filter))`n</Select></Query></QueryList>"
+            if ($FilterCount -eq 0) {
+               $BaseFilter = "<QueryList>`n<Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter)`n</Select>`n</Query>`n</QueryList>"
             } else {
-                $BaseFilter = "<QueryList><Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter))`n</Select></Query></QueryList>"
+                $BaseFilter = "<QueryList>`n<Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter))`n</Select>`n</Query>`n</QueryList>"
             }
+
         }
 
         Write-Verbose -Message $BaseFilter
