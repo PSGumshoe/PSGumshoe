@@ -61,7 +61,8 @@ FunctionsToExport = @(
     'Get-SysmonServiceStateChange',
     'Get-SysmonWmiBinding',
     'Get-SysmonWmiConsumer',
-    'Get-SysmonWmiFilter'
+    'Get-SysmonWmiFilter',
+    'Get-SysmonProcessActivityEvent'
 )
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.

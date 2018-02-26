@@ -48,7 +48,7 @@ function Search-SysmonEvent {
                 if ($IdFilterCount -eq 0) {
                    $idFilter =  "(System/EventID=$($id))"
                 } else {
-                    $idFilter += "or (System/EventID=$($id))"
+                    $idFilter += " or (System/EventID=$($id))"
                 }
                 $IdFilterCount++
             }
