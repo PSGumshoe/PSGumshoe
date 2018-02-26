@@ -33,7 +33,7 @@ function Search-SysmonEvent {
         # Get paramters for use in creating the filter.
         #$Params = $MyInvocation.BoundParameters.Keys
         $Params = $ParamHash.keys
-        $CommonParams = ([System.Management.Automation.Cmdlet]::CommonParameters) + @('Credential', 'ComputerName', 'MaxEvents', 'StartTime', 'EndTime', 'Path', 'ChangeLogic')
+        $CommonParams = ([System.Management.Automation.Cmdlet]::CommonParameters) + @('Credential', 'ComputerName', 'MaxEvents', 'StartTime', 'EndTime', 'Path', 'ChangeLogic','ActivityType')
 
         $FinalParams = @()
         foreach ($p in $Params) {
@@ -60,7 +60,8 @@ function Search-SysmonEvent {
 
         # Manage change in Logic
         $logicOperator = 'and'
-        if ($ChangeLogic) {
+        if ($ParamHash['ChangeLogic']) {
+            Write-Verbose -Message 'Changing logic for fields from "and" to "or"'
            $logicOperator = 'or'
         }
 
@@ -72,7 +73,7 @@ function Search-SysmonEvent {
                    if ($FilterCount -gt 0) {
                        $filter = $filter + "`n $( $logicOperator ) *[EventData[Data[@Name='$($Param)']='$($val)']]"
                    } else {
-                       $filter = $filter + "`n and (*[EventData[Data[@Name='$($Param)']='$($val)']]"
+                       $filter = $filter + "`n $( $logicOperator ) (*[EventData[Data[@Name='$($Param)']='$($val)']]"
                    }
                    $FilterCount += 1
                }

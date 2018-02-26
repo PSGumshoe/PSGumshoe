@@ -28,6 +28,13 @@ function Get-SysmonProcessActivityEvent {
         [string[]]
         $ProcessGuid,
 
+        # Type of Activity to get.
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Create', 'Terminate', 'FileTime', 'NetworkConnect','ImageLoad','RawAccess', 'FileCreate', 'RegistryKey',
+                     'RegistryVAlue','RegistryName', 'FileStream', 'NamedPipeCreate', 'NamedPipeConnect', 'CreateRemoteThread', 'AccessProcess', 'All')]
+        [String[]]
+        $ActivityType = 'All',
+
         # Specifies the path to an Sysmon evtx file.  Wildcards are permitted.
         [Parameter(Mandatory = $false,
         ValueFromPipelineByPropertyName = $true,
@@ -79,7 +86,38 @@ function Get-SysmonProcessActivityEvent {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "process" -EventId 1,2,3,5,7,9,11,12,13,14,15,17,18 -ParamHash $MyInvocation.BoundParameters
+        $TypeIds = @()
+        foreach ($Type in $ActivityType) {
+            switch ($Type) {
+                'Create'{ $TypeIds += 1 }
+                'Terminate'{ $TypeIds += 5 }
+                'FileTime' { $TypeIds += 2 }
+                'NetworkConnect' { $TypeIds += 3 }
+                'ImageLoad' { $TypeIds += 7 }
+                'RawAccess' { $TypeIds += 9 }
+                'FileCreate' {$TypeIds += 11 }
+                'RegistryKey' {$TypeIds += 12 }
+                'RegistryValue' {$TypeIds += 13 }
+                'RegistryName' {$TypeIds += 14 }
+                'FileStream' {$TypeIds += 15 }
+                'NamedPipeCreate' {$TypeIds += 17 }
+                'NamedPipeConnect' {$TypeIds += 18 }
+                'CreateRemoteThread' {$TypeIds += 8}
+                'AccessProcess' {$TypeIds += 10}
+                'All' {
+                    $TypeIds = 1,2,3,5,7,9,11,12,13,14,15,17,18
+                    break
+                }
+                Default {$TypeIds = 1,2,3,5,7,9,11,12,13,14,15,17,18}
+            }
+        }
+        write-verbose -Message "Events: $($typeIds)"
+        $ParametersToSet = $MyInvocation.BoundParameters
+        $ParametersToSet.Add('ChangeLogic',$true)
+        $ParametersToSet.Add('SourceProcessGUID', $ProcessGuid)
+        $ParametersToSet.Add('TargetProcessGUID', $ProcessGuid)
+
+        Search-SysmonEvent -RecordType "process" -EventId $TypeIds -ParamHash $ParametersToSet
     }
 
     end {}
