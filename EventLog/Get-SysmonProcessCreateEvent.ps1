@@ -113,6 +113,13 @@ function Get-SysmonProcessCreateEvent {
         [string[]]
         $ParentCommandLine,
 
+        # Parent process command line.
+        [Parameter(Mandatory = $false,
+        ValueFromPipelineByPropertyName = $true,
+        ParameterSetName = 'File')]
+        [string]
+        $Path,
+
         # Gets events from the event logs on the specified computer. Type the NetBIOS name, an Internet Protocol (IP) address, or the fully qualified domain name of the computer.
         # The default value is the local computer.
         # To get events and event logs from remote computers, the firewall port for the event log service must be configured to allow remote access.

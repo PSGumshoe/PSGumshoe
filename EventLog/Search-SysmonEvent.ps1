@@ -29,10 +29,16 @@ function Search-SysmonEvent {
     )
 
     begin {
+
         # Get paramters for use in creating the filter.
         #$Params = $MyInvocation.BoundParameters.Keys
         $Params = $ParamHash.keys
         $CommonParams = ([System.Management.Automation.Cmdlet]::CommonParameters) + @('Credential', 'ComputerName', 'MaxEvents', 'StartTime', 'EndTime', 'Path', 'ChangeLogic')
+
+        # If Path is provided ensure we only resolve to first file and prevent a wildcard to be given.
+        if ($Params -contains 'Path') {
+            $FullPath = (Resolve-Path -Path $ParamHash['Path']).Path
+        }
 
         $FinalParams = @()
         foreach ($p in $Params) {
@@ -79,9 +85,17 @@ function Search-SysmonEvent {
 
         # Concatenate all the filters in to one single XML Filter.
         if ($FilterCount -eq 0) {
-            $BaseFilter = "<QueryList><Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter)`n</Select></Query></QueryList>"
+            if ($Params -contains 'Path') {
+                $BaseFilter = "<QueryList><Query Id='0' Path='file://$($FullPath)'>`n<Select>$($filter)`n</Select></Query></QueryList>"
+            } else {
+                $BaseFilter = "<QueryList><Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter)`n</Select></Query></QueryList>"
+            }
         } else {
-            $BaseFilter = "<QueryList><Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter))`n</Select></Query></QueryList>"
+            if ($Params -contains 'Path') {
+                $BaseFilter = "<QueryList><Query Id='0' Path='file://$($FullPath)'>`n<Select>$($filter))`n</Select></Query></QueryList>"
+            } else {
+                $BaseFilter = "<QueryList><Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter))`n</Select></Query></QueryList>"
+            }
         }
 
         Write-Verbose -Message $BaseFilter
