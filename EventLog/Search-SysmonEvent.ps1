@@ -65,18 +65,19 @@ function Search-SysmonEvent {
            $logicOperator = 'or'
         }
 
-        $FilterCount = 0
         foreach ($Param in $FinalParams) {
             if ($param -notin $CommonParams) {
                $FieldValue = $ParamHash["$($param)"]
+               $FilterCount = 0
                foreach($val in $FieldValue) {
                    if ($FilterCount -gt 0) {
-                       $filter = $filter + "`n $( $logicOperator ) *[EventData[Data[@Name='$($Param)']='$($val)']]"
+                       $filter = $filter + "`n or *[EventData[Data[@Name='$($Param)']='$($val)']]"
                    } else {
                        $filter = $filter + "`n $( $logicOperator ) (*[EventData[Data[@Name='$($Param)']='$($val)']]"
                    }
                    $FilterCount += 1
                }
+               $filter += ") "
             }
         }
 
@@ -103,7 +104,7 @@ function Search-SysmonEvent {
                 if ($FilterCount -eq 0) {
                     $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($filter)`n</Select>`n</Query>"
                 } else {
-                    $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($filter))`n</Select>`n</Query>"
+                    $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($filter)`n</Select>`n</Query>"
                 }
                 $QueryId++
             }
@@ -112,7 +113,7 @@ function Search-SysmonEvent {
             if ($FilterCount -eq 0) {
                $BaseFilter = "<QueryList>`n<Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter)`n</Select>`n</Query>`n</QueryList>"
             } else {
-                $BaseFilter = "<QueryList>`n<Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter))`n</Select>`n</Query>`n</QueryList>"
+                $BaseFilter = "<QueryList>`n<Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter)`n</Select>`n</Query>`n</QueryList>"
             }
 
         }
@@ -128,24 +129,24 @@ function Search-SysmonEvent {
                $ComputerName | ForEach-Object {
                    if ($Credential -eq $null) {
                        if ($MaxEvents -gt 0) {
-                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ | ConvertFrom-SysmonEventLogRecord  -RecordType $RecordType
+                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ | ConvertFrom-SysmonEventLogRecord
                        } else {
-                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_| ConvertFrom-SysmonEventLogRecord  -RecordType $RecordType
+                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_| ConvertFrom-SysmonEventLogRecord
                        }
                    } else {
                        if ($MaxEvents -gt 0) {
-                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential | ConvertFrom-SysmonEventLogRecord -RecordType $RecordType
+                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential | ConvertFrom-SysmonEventLogRecord
                        } else {
-                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential | ConvertFrom-SysmonEventLogRecord -RecordType $RecordType
+                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential | ConvertFrom-SysmonEventLogRecord
                        }
                    }
                }
            }
            Default {
                if ($MaxEvents -gt 0) {
-                   Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents | ConvertFrom-SysmonEventLogRecord -RecordType $RecordType
+                   Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents | ConvertFrom-SysmonEventLogRecord
                } else {
-                   Get-WinEvent -FilterXml $BaseFilter | ConvertFrom-SysmonEventLogRecord -RecordType $RecordType
+                   Get-WinEvent -FilterXml $BaseFilter | ConvertFrom-SysmonEventLogRecord
                }
            }
        }
