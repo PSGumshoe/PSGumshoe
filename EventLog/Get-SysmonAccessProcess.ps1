@@ -1,9 +1,11 @@
 function Get-SysmonAccessProcess {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon Access Procces EventLog Events (EventId 10).
     .DESCRIPTION
-        Long description
+        Get Sysmon Process Access events either locally or remotely from a specified location.
+        These events have an EventID of 10 and are for when a process acceses the memory space
+        of a given process.
     .EXAMPLE
         PS C:\> <example usage>
         Explanation of what the example does
@@ -22,31 +24,37 @@ function Get-SysmonAccessProcess {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
+        # The GUID value created by Sysmon that uniquely and universally identifies the process instance accesing a target process.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SourceProcessGuid,
 
+        # The PID of the source process.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SourceProcessId,
 
+        # The thread ID of the source process that identifies the process instance accesing a target process.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SourceThreadId,
 
+        # The full path of the main executable image of the target process.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $TargetImage,
 
+        # The permission granted to the sourced process when accesing the target process.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $GrantAccess,
 
+        # The call traced of the source procees acceing the target process.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]

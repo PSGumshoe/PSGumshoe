@@ -2,16 +2,16 @@
 function Get-SysmonConfigChange {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon configuration change events (EventId 16).
     .DESCRIPTION
-        Long description
+        Get Sysmon configuration change events either locally or remotely from a specified location.
+        These events have an EventID of 16 and are for when a configuration is updated or cleared using
+        the sysmon.exe tool.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
-    .INPUTS
-        Inputs (if any)
+        PS C:\> Get-SysmonConfigChange -ConfigurationFileHash ''
+        Get events with a empty configuration file hash field. This may be due to a configuration being modified or cleared via the command line.
     .OUTPUTS
-        Output (if any)
+        Sysmon.EventRecord.ConfigChange
     .NOTES
         General notes
     #>
@@ -23,11 +23,14 @@ function Get-SysmonConfigChange {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
+        # Full path of XML file used for configuration, current folder of the process and full command line of execution for configuration or
+        # currentlocation with the word Default at the end of the path in case the configuration was reset to default values.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Configuration,
 
+        # File hash for the configuration file used to configure Sysmon.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
