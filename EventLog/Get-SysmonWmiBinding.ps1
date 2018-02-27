@@ -47,6 +47,18 @@ function Get-SysmonWmiBinding {
         [string[]]
         $Filter,
 
+        # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
+        [Parameter(Mandatory=$true,
+                   Position=0,
+                   ParameterSetName="file",
+                   ValueFromPipeline=$true,
+                   ValueFromPipelineByPropertyName=$true)]
+        [Alias("PSPath")]
+        [ValidateNotNullOrEmpty()]
+        [SupportsWildcards()]
+        [string[]]
+        $Path,
+
         # Gets events from the event logs on the specified computer. Type the NetBIOS name, an Internet Protocol (IP) address, or the fully qualified domain name of the computer.
         # The default value is the local computer.
         # To get events and event logs from remote computers, the firewall port for the event log service must be configured to allow remote access.

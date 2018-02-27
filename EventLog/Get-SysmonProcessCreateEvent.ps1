@@ -113,12 +113,18 @@ function Get-SysmonProcessCreateEvent {
         [string[]]
         $ParentCommandLine,
 
-        # Parent process command line.
-        [Parameter(Mandatory = $false,
-        ValueFromPipelineByPropertyName = $true,
-        ParameterSetName = 'File')]
+        # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
+        [Parameter(Mandatory=$true,
+                   Position=0,
+                   ParameterSetName="file",
+                   ValueFromPipeline=$true,
+                   ValueFromPipelineByPropertyName=$true)]
+        [Alias("PSPath")]
+        [ValidateNotNullOrEmpty()]
+        [SupportsWildcards()]
         [string[]]
         $Path,
+
 
         # Gets events from the event logs on the specified computer. Type the NetBIOS name, an Internet Protocol (IP) address, or the fully qualified domain name of the computer.
         # The default value is the local computer.
