@@ -3,7 +3,7 @@ function Get-SysmonConnectNamedPipe {
     .SYNOPSIS
         Short description
     .DESCRIPTION
-        Long description
+        This event logs when a named pipe connection is made between a client and a server
     .EXAMPLE
         PS C:\> <example usage>
         Explanation of what the example does

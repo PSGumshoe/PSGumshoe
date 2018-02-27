@@ -3,7 +3,7 @@ function Get-SysmonCreateNamedPipe {
     .SYNOPSIS
         Short description
     .DESCRIPTION
-        Long description
+        This event generates when a named pipe is created. Malware often uses named pipes for interprocess communication.
     .EXAMPLE
         PS C:\> <example usage>
         Explanation of what the example does

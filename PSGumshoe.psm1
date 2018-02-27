@@ -45,7 +45,7 @@
 . $PSScriptRoot\EventLog\Get-SysmonCreateRemoteThreadEvent.ps1
 . $PSScriptRoot\EventLog\Get-SysmonDriverLoadEvent.ps1
 . $PSScriptRoot\EventLog\Get-SysmonFileCreateEvent.ps1
-. $PSScriptRoot\EventLog\Get-SysmonFileStareamHash.ps1
+. $PSScriptRoot\EventLog\Get-SysmonFileStreamHash.ps1
 . $PSScriptRoot\EventLog\Get-SysmonFileTime.ps1
 . $PSScriptRoot\EventLog\Get-SysmonImageLoadEvent.ps1
 . $PSScriptRoot\EventLog\Get-SysmonNetworkConnect.ps1

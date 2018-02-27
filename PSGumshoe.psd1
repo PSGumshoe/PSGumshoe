@@ -48,7 +48,7 @@ FunctionsToExport = @(
     'Get-SysmonCreateRemoteThreadEvent',
     'Get-SysmonDriverLoadEvent',
     'Get-SysmonFileCreateEvent',
-    'Get-SysmonFileStareamHash',
+    'Get-SysmonFileStreamHash',
     'Get-SysmonFileTime',
     'Get-SysmonImageLoadEvent',
     'Get-SysmonNetworkConnect ',

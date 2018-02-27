@@ -4,7 +4,7 @@ function Get-SysmonCreateRemoteThreadEvent {
     .SYNOPSIS
         Short description
     .DESCRIPTION
-        Long description
+        The CreateRemoteThread event detects when a process creates a thread in another process. This technique is used by malware to inject code and hide in other processes. The event indicates the source and target process. It gives information on the code that will be run in the new thread: StartAddress, StartModule and StartFunction. Note that StartModule and StartFunction fields are inferred, they might be empty if the starting address is outside loaded modules or known exported functions.
     .EXAMPLE
         PS C:\> <example usage>
         Explanation of what the example does

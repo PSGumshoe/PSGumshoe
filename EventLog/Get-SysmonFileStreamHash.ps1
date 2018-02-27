@@ -1,4 +1,4 @@
-function Get-SysmonFileStareamHash {
+function Get-SysmonFileStreamHash {
     <#
     .SYNOPSIS
         Short description
