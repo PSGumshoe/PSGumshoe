@@ -117,7 +117,7 @@ function Get-SysmonProcessActivityEvent {
         $ParametersToSet.Add('SourceProcessGUID', $ProcessGuid)
         $ParametersToSet.Add('TargetProcessGUID', $ProcessGuid)
 
-        Search-SysmonEvent -RecordType "process" -EventId $TypeIds -ParamHash $ParametersToSet
+        Search-SysmonEvent -EventId $TypeIds -ParamHash $ParametersToSet
     }
 
     end {}

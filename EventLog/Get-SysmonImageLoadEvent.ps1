@@ -129,7 +129,7 @@ function Get-SysmonImageLoadEvent {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "ImageLoad" -EventId 7 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 7 -ParamHash $MyInvocation.BoundParameters
 
     }
 

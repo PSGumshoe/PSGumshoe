@@ -91,7 +91,7 @@ function Get-SysmonFileStareamHash {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "FileCreateStream" -EventId 15 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 15 -ParamHash $MyInvocation.BoundParameters
 
     }
 

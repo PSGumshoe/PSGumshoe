@@ -87,7 +87,7 @@ function Get-SysmonFileTime {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "FileTime" -EventId 2 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 2 -ParamHash $MyInvocation.BoundParameters
 
     }
 

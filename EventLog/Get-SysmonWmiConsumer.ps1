@@ -101,7 +101,7 @@ function Get-SysmonWmiConsumer {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "WmiConsumer" -EventId 20 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 20 -ParamHash $MyInvocation.BoundParameters
 
     }
 

@@ -85,7 +85,7 @@ function Get-SysmonProcessTerminateEvent {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "ProcessTerminated" -EventId 5 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 5 -ParamHash $MyInvocation.BoundParameters
 
     }
 

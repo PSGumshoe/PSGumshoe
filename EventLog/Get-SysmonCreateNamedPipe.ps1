@@ -86,7 +86,7 @@ function Get-SysmonCreateNamedPipe {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "CreateNamedPipe" -EventId 17 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 17 -ParamHash $MyInvocation.BoundParameters
 
     }
 

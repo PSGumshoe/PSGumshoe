@@ -86,7 +86,7 @@ function Get-SysmonRegistryKey {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "RegistryKey" -EventId 12 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 12 -ParamHash $MyInvocation.BoundParameters
 
     }
 

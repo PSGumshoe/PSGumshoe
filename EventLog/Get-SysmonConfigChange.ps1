@@ -77,7 +77,7 @@ function Get-SysmonConfigChange {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "ConfigChange" -EventId 16 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 16 -ParamHash $MyInvocation.BoundParameters
 
     }
 

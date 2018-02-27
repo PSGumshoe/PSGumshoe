@@ -87,7 +87,7 @@ function Get-SysmonRawAccessRead {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "RawAccessRead" -EventId 9 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 9 -ParamHash $MyInvocation.BoundParameters
 
     }
 

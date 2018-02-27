@@ -91,7 +91,7 @@ function Get-SysmonRegistrySetValue {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "RegistrySetValue" -EventId 13 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 13 -ParamHash $MyInvocation.BoundParameters
 
     }
 

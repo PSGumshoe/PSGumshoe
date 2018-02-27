@@ -83,7 +83,7 @@ function Get-SysmonDriverLoadEvent {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "DriverLoad" -EventId 6 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 6 -ParamHash $MyInvocation.BoundParameters
 
     }
 

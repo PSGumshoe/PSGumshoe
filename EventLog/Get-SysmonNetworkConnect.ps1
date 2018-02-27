@@ -150,7 +150,7 @@ function Get-SysmonNetworkConnect {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "NetworkConnect" -EventId 3 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 3 -ParamHash $MyInvocation.BoundParameters
 
     }
 

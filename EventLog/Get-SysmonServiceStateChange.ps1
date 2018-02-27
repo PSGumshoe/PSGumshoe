@@ -84,7 +84,7 @@ function Get-SysmonServiceStateChange {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "ServiceState" -EventId 4 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 4 -ParamHash $MyInvocation.BoundParameters
 
     }
 

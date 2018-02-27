@@ -97,7 +97,7 @@ function Get-SysmonAccessProcess {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "AccessProcess" -EventId 10 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 10 -ParamHash $MyInvocation.BoundParameters
 
     }
 

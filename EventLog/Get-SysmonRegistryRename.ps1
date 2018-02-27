@@ -91,7 +91,7 @@ function Get-SysmonRegistryRename {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "RegistryRename" -EventId 14 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 14 -ParamHash $MyInvocation.BoundParameters
 
     }
 

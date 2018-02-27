@@ -164,7 +164,7 @@ function Get-SysmonProcessCreateEvent {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "ProcessCreate" -EventId 1 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 1 -ParamHash $MyInvocation.BoundParameters
 
     }
 

@@ -20,26 +20,46 @@ function ConvertFrom-SysmonEventLogRecord {
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
         [System.Diagnostics.Eventing.Reader.EventLogRecord]
-        $Event,
-
-        # Sysmon Event Record Type
-        [Parameter(Mandatory = $true)]
-        [string]
-        $RecordType
+        $Event
     )
-    begin {}
+    begin {
+        $EventIdtoType = @{
+            '1' = 'ProcessCreate'
+            '2' = 'FileCreateTime'
+            '3' = 'NetworkConnect'
+            '5' = 'ProcessTerminate'
+            '6' = 'DriverLoad'
+            '7' = 'ImageLoad'
+            '8' = 'CreateRemoteThread'
+            '9' = 'RawAccessRead'
+            '10' = 'ProcessAccess'
+            '11' = 'FileCreate'
+            '12' = 'RegistryAddOrDelete'
+            '13' = 'RegistryValueSet'
+            '14' = 'RegistryRename'
+            '15' = 'FileCreateStreamHash'
+            '16' = 'ConfigChange'
+            '17' = 'PipeCreated'
+            '18' = 'PipeConnected'
+            '19' = 'WmiFilter'
+            '20' = 'WmiConsumer'
+            '21' = 'WmiBinding'
+            '255' = 'Error'
+        }
+    }
 
     process {
         [xml]$evtxml = $Event.toxml()
         $ProcInfo = [ordered]@{}
         $ProcInfo['EventId'] = $evtxml.Event.System.EventID
+        $ProcInfo['EventType'] = "$($EventIdtoType[$([string]$evtxml.Event.System.EventID)] )"
         $ProcInfo['Computer'] = $evtxml.Event.System.Computer
         $ProcInfo['EventRecordID'] = $evtxml.Event.System.EventRecordID
         $evtxml.Event.EventData.Data | ForEach-Object {
             $ProcInfo[$_.name] = $_.'#text'
         }
         $Obj = New-Object psobject -Property $ProcInfo
-        $Obj.pstypenames[0] = "Sysmon.EventRecord.$( $RecordType )"
+        $Obj.pstypenames[0] = "Sysmon.EventRecord.$($EventIdtoType[$([string]$evtxml.Event.System.EventID)] )"
         $Obj
     }
 

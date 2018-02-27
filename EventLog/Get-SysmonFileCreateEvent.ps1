@@ -92,7 +92,7 @@ function Get-SysmonFileCreateEvent {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "FileCreate" -EventId 11 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 11 -ParamHash $MyInvocation.BoundParameters
 
     }
 

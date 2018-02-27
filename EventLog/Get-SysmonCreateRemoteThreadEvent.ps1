@@ -117,7 +117,7 @@ function Get-SysmonCreateRemoteThreadEvent {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "CreateRemoteThread" -EventId 8 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 8 -ParamHash $MyInvocation.BoundParameters
 
     }
 

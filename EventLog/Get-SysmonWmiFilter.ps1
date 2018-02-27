@@ -96,7 +96,7 @@ function Get-SysmonWmiFilter {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "WmiFilter" -EventId 19 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 19 -ParamHash $MyInvocation.BoundParameters
 
     }
 

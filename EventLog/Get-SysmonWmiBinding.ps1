@@ -91,7 +91,7 @@ function Get-SysmonWmiBinding {
     begin {}
 
     process {
-        Search-SysmonEvent -RecordType "WmiBinding" -EventId 21 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 21 -ParamHash $MyInvocation.BoundParameters
 
     }
 
