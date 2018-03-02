@@ -6,8 +6,37 @@ function Get-SysmonProcessCreateEvent {
     .DESCRIPTION
         Long description
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> $OfficeImages = @('C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE',
+        'C:\Program Files\Microsoft Office\root\Office16\POWERPNT.EXE',
+        'C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE',
+        'C:\Program Files\Microsoft Office\root\Office16\GRAPH.EXE',
+        C:\Program Files\Microsoft Office\root\Office16\ONENOTE.EXE')
+
+        PS C:\> Get-SysmonProcessCreateEvent -ParentImage $OfficeImages
+
+        Find all processes created by Office applications.
+    .EXAMPLE
+        PS C:\> Get-SysmonProcessCreateEvent -ProcessId 426128 | select "processguid","utctime","image"
+
+        ProcessGuid                            UtcTime                 Image
+        -----------                            -------                 -----
+        {278123BE-DFF1-5A95-0000-00106E3B1639} 2018-02-27 22:47:13.439 C:\Program Files\Git\cmd\git.exe
+        {278123BE-DE90-5A95-0000-0010648A0C39} 2018-02-27 22:41:20.318 C:\Program Files\Git\mingw64\bin\git.exe
+        {278123BE-709D-5A95-0000-00100437E438} 2018-02-27 14:52:13.340 C:\Program Files\Git\mingw64\bin\git.exe
+
+        Check for PID re-use.
+
+    .EXAMPLE
+        PS C:\> $grouped = Get-SysmonProcessCreateEvent -Image "C:\Windows\system32\rundll32.exe" | Group-Object -Property "commandline"
+        PS C:\> $grouped | Select-Object -Property name
+
+        Name
+        ----
+        "C:\WINDOWS\System32\rundll32.exe" "C:\WINDOWS\System32\winethc.dll",ForceProxyDetectionOnNextRun
+        C:\WINDOWS\system32\rundll32.exe Startupscan.dll,SusRunTask
+        rundll32.exe AppXDeploymentExtensions.OneCore.dll,ShellRefresh
+
+        Check for unique commandline instances for a given image.
     .INPUTS
         Inputs (if any)
     .OUTPUTS
@@ -117,9 +146,8 @@ function Get-SysmonProcessCreateEvent {
         [Parameter(Mandatory=$true,
                    Position=0,
                    ParameterSetName="file",
-                   ValueFromPipeline=$true,
                    ValueFromPipelineByPropertyName=$true)]
-        [Alias("PSPath")]
+        [Alias("FullName")]
         [ValidateNotNullOrEmpty()]
         [SupportsWildcards()]
         [string[]]

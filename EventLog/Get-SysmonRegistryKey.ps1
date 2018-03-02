@@ -46,9 +46,8 @@ function Get-SysmonRegistryKey {
         [Parameter(Mandatory=$true,
                    Position=0,
                    ParameterSetName="file",
-                   ValueFromPipeline=$true,
                    ValueFromPipelineByPropertyName=$true)]
-        [Alias("PSPath")]
+        [Alias("FullName")]
         [ValidateNotNullOrEmpty()]
         [SupportsWildcards()]
         [string[]]

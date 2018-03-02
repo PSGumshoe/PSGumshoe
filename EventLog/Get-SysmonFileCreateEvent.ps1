@@ -51,13 +51,13 @@ function Get-SysmonFileCreateEvent {
         [Parameter(Mandatory=$true,
                    Position=0,
                    ParameterSetName="file",
-                   ValueFromPipeline=$true,
                    ValueFromPipelineByPropertyName=$true)]
-        [Alias("PSPath")]
+        [Alias("FullName")]
         [ValidateNotNullOrEmpty()]
         [SupportsWildcards()]
         [string[]]
         $Path,
+
 
         # Gets events from the event logs on the specified computer. Type the NetBIOS name, an Internet Protocol (IP) address, or the fully qualified domain name of the computer.
         # The default value is the local computer.
