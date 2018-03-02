@@ -5,14 +5,12 @@ function Get-SysmonCreateNamedPipe {
     .DESCRIPTION
         This event generates when a named pipe is created. Malware often uses named pipes for interprocess communication.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonCreatePipe -ComputerName wec1.contoso.com -LogName "Forwarded Events"
+        Query remote Windows Event Collector server for Named Pipe creation events.
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
-    .NOTES
-        General notes
+        Sysmon.EventRecord.PipeCreated
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -22,21 +20,25 @@ function Get-SysmonCreateNamedPipe {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
+        # Unique GUID for the process that created the named pipe.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessGuid,
 
+        # PID of process that created the named pipe.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessId,
 
+        # Full path of process image that created the named pipe.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Image,
 
+        # Name given by the process to the named pipe.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
@@ -89,7 +91,7 @@ function Get-SysmonCreateNamedPipe {
         [datetime]
         $EndTime,
 
-        # Changes the default logic for matching fields from 'and' to 'or'.
+        # Changes the default logic for matching between fields from 'and' to 'or'.
         [Parameter(Mandatory = $false)]
         [switch]
         $ChangeLogic

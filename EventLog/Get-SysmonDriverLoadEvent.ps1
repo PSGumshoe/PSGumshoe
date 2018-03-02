@@ -8,11 +8,9 @@ function Get-SysmonDriverLoadEvent {
         PS C:\> <example usage>
         Explanation of what the example does
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
-    .NOTES
-        General notes
+        Sysmon.EventRecord.DriverLoad
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (

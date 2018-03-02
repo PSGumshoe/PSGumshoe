@@ -9,11 +9,9 @@ function Get-SysmonCreateRemoteThreadEvent {
         PS C:\> <example usage>
         Explanation of what the example does
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
-    .NOTES
-        General notes
+        Sysmon.EventRecord.CreateRemoteThread
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -23,51 +21,61 @@ function Get-SysmonCreateRemoteThreadEvent {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
+        # The unique Process GUID of the process that is creating the remote thread.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SourceProcessGuid,
 
+        # the PID of the process that is creating the remote thread.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SourceProcessId,
 
+        # The full path of the process image for the process that is creating the remote thread.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SourceImage,
 
+        # The unique Process GUID for the process where the remote thread is being created.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $TargetProcessGuid,
 
+        # The PID of the process where the remote thread is being created.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $TargetProcessId,
 
+        # The full path for the process image of the process where the remote thread is being created.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $TargetImage,
 
+        # The thread Id for the process cresated.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $NewThread,
 
+        # The start address for the thread created.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $StartAddress,
 
+        # The full path to the image of the module used to created the remote thread.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $StartModule,
 
+        # The function name where the remote thread was started.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]

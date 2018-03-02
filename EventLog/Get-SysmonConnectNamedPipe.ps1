@@ -5,14 +5,12 @@ function Get-SysmonConnectNamedPipe {
     .DESCRIPTION
         This event logs when a named pipe connection is made between a client and a server
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonConnectedPipe -ComputerName wec1.contoso.com -LogName "Forwarded Events"
+        Query remote Windows Event Collector server for Named Pipes connection events.
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
-    .NOTES
-        General notes
+        Sysmon.EventRecord.PipeConnected
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -22,21 +20,25 @@ function Get-SysmonConnectNamedPipe {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
+        # Unique GUID for the process that is connecting via named pipe.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessGuid,
 
+        # The PID of the process connecting to the named pipe.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessId,
 
+        # Full path to the image of the process.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Image,
 
+        # Name of the pipe created by the propcess.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]

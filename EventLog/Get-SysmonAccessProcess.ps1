@@ -12,7 +12,7 @@ function Get-SysmonAccessProcess {
     .INPUTS
         System.IO.FileInfo
     .OUTPUTS
-        Sysmon.EventRecord.ProcessCreate
+        Sysmon.EventRecord.ProcessAccess
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (

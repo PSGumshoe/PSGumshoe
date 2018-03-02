@@ -10,10 +10,10 @@ function Get-SysmonConfigChange {
     .EXAMPLE
         PS C:\> Get-SysmonConfigChange -ConfigurationFileHash ''
         Get events with a empty configuration file hash field. This may be due to a configuration being modified or cleared via the command line.
+    .INPUTS
+        System.IO.FileInfo
     .OUTPUTS
         Sysmon.EventRecord.ConfigChange
-    .NOTES
-        General notes
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
