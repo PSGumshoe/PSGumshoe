@@ -38,11 +38,9 @@ function Get-SysmonProcessCreateEvent {
 
         Check for unique commandline instances for a given image.
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
-    .NOTES
-        General notes
+        Sysmon.EventRecord.ProcessCreate
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
