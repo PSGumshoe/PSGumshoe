@@ -7,14 +7,12 @@ function Get-SysmonAccessProcess {
         These events have an EventID of 10 and are for when a process acceses the memory space
         of a given process.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonAccessProcess -TargetImage "C:\Windows\System32\lsass.exe"
+        Check if any process has opened lsass.exe. This may be a malicious process trying to dump password hashes.
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
-    .NOTES
-        General notes
+        Sysmon.EventRecord.ProcessCreate
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
