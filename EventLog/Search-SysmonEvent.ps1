@@ -33,7 +33,7 @@ function Search-SysmonEvent {
         # Get paramters for use in creating the filter.
         #$Params = $MyInvocation.BoundParameters.Keys
         $Params = $ParamHash.keys
-        $CommonParams = ([System.Management.Automation.Cmdlet]::CommonParameters) + @('Credential', 'ComputerName', 'MaxEvents', 'StartTime', 'EndTime', 'Path', 'ChangeLogic','ActivityType')
+        $CommonParams = ([System.Management.Automation.Cmdlet]::CommonParameters) + @('Credential', 'ComputerName', 'MaxEvents', 'StartTime', 'EndTime', 'Path', 'ChangeLogic','ActivityType','Suppress')
 
         $FinalParams = @()
         foreach ($p in $Params) {
@@ -52,16 +52,16 @@ function Search-SysmonEvent {
                 }
                 $IdFilterCount++
             }
-            $filter = "`n*[System/Provider[@Name='microsoft-windows-sysmon'] and ($($idFilter))] "
+            $SelectFilter = "`n*[System/Provider[@Name='microsoft-windows-sysmon'] and ($($idFilter))] "
         } else {
-            $filter = "`n*[System/Provider[@Name='microsoft-windows-sysmon'] and (System/EventID=$($EventId))] "
+            $SelectFilter = "`n*[System/Provider[@Name='microsoft-windows-sysmon'] and (System/EventID=$($EventId))] "
         }
 
 
+        $filter = " "
         # Manage change in Logic
         $logicOperator = 'and'
         if ($ParamHash['ChangeLogic']) {
-            Write-Verbose -Message 'Changing logic for fields from "and" to "or"'
            $logicOperator = 'or'
         }
 
@@ -70,11 +70,15 @@ function Search-SysmonEvent {
                $FieldValue = $ParamHash["$($param)"]
                $FilterCount = 0
                foreach($val in $FieldValue) {
-                   if ($FilterCount -gt 0) {
+                    if ($FilterCount -gt 0) {
                        $filter = $filter + "`n or *[EventData[Data[@Name='$($Param)']='$($val)']]"
-                   } else {
-                       $filter = $filter + "`n $( $logicOperator ) (*[EventData[Data[@Name='$($Param)']='$($val)']]"
-                   }
+                    } else {
+                        if ($Params -contains 'Suppress') {
+                            $filter = $filter + "`n (*[EventData[Data[@Name='$($Param)']='$($val)']]"
+                        } else {
+                            $filter = $filter + "`n $( $logicOperator ) (*[EventData[Data[@Name='$($Param)']='$($val)']]"
+                        }
+                    }
                    $FilterCount += 1
                }
                $filter += ") "
@@ -102,18 +106,33 @@ function Search-SysmonEvent {
             # Resolve all paths provided and process each.
             (Resolve-Path -Path $ParamHash['Path']).Path | ForEach-Object {
                 if ($FilterCount -eq 0) {
-                    $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($filter)`n</Select>`n</Query>"
+                    $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($SelectFilter + $filter)`n</Select>`n</Query>"
                 } else {
-                    $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($filter)`n</Select>`n</Query>"
+                    if ($Params -contains 'Suppress') {
+                        $BaseFilter = "<QueryList>`n<Query Id='0' Path='file://$($_)'>`n"
+                        $BaseFilter += "<Select Path='$($LogName)'>$($SelectFilter)`n</Select>`n"
+                        $BaseFilter += "<Suppress Path='$($LogName)'>$($filter)`n</Suppress>`n"
+                        $BaseFilter += "</Query>`n</QueryList>"
+
+                    } else {
+                        $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($SelectFilter + $filter)`n</Select>`n</Query>"
+                    }
                 }
                 $QueryId++
             }
             $BaseFilter = "<QueryList>`n$($Querys)`n</QueryList>"
         } else {
             if ($FilterCount -eq 0) {
-               $BaseFilter = "<QueryList>`n<Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter)`n</Select>`n</Query>`n</QueryList>"
+               $BaseFilter = "<QueryList>`n<Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($SelectFilter + $filter)`n</Select>`n</Query>`n</QueryList>"
             } else {
-                $BaseFilter = "<QueryList>`n<Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($filter)`n</Select>`n</Query>`n</QueryList>"
+                if ($Params -contains 'Suppress') {
+                    $BaseFilter = "<QueryList>`n<Query Id='0' Path='$($LogName)'>`n"
+                    $BaseFilter += "<Select Path='$($LogName)'>$($SelectFilter)`n</Select>`n"
+                    $BaseFilter += "<Suppress Path='$($LogName)'>$($filter)`n</Suppress>`n"
+                    $BaseFilter += "</Query>`n</QueryList>"
+                } else {
+                    $BaseFilter = "<QueryList>`n<Query Id='0' Path='$($LogName)'>`n<Select Path='$($LogName)'>$($SelectFilter + $filter)`n</Select>`n</Query>`n</QueryList>"
+                }
             }
 
         }
