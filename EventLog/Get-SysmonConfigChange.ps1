@@ -86,7 +86,12 @@ function Get-SysmonConfigChange {
         # Changes the default logic for matching fields from 'and' to 'or'.
         [Parameter(Mandatory = $false)]
         [switch]
-        $ChangeLogic
+        $ChangeLogic,
+
+        # Changes the query action from inclusion to exclusion when fields are matched.
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $Suppress
     )
 
     begin {}
