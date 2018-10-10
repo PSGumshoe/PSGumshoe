@@ -1,18 +1,18 @@
 function Get-SysmonFileStreamHash {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon File Stream Creation events (EventId 15).
     .DESCRIPTION
-        Long description
+        This event logs when a named file stream is created, and it generates events that log the hash of the contents of the file to which the stream is assigned (the unnamed stream), as well as the contents of the named stream. There are malware variants that drop their executables or configuration settings via browser downloads, and this event is aimed at capturing that based on the browser attaching a Zone.Identifier “mark of the web” stream. This event also logs the creation of alternate data streams where a files hides another in the alternate data stream of another.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonFileStreamHash  -Image 'C:\WINDOWS\system32\cmd.exe'
+        Find all streams created from cmd.exe.
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
+        Sysmon.EventRecord.FileCreateStreamHash
     .NOTES
-        General notes
+        https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=90015
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -22,30 +22,41 @@ function Get-SysmonFileStreamHash {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
+        # Process GUID of the process that created a file stream.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessGuid,
 
+        # Process Id of the process that created a file stream.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessId,
 
+        # Full path of the process image that created a file stream.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Image,
 
+        # Name of the file where the file stream was created.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $TargetFileName,
 
+        # Hash for the alternate data stream that was created.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Hash,
+
+         # Rule Name for filter that generated the event.
+         [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+         [string[]]
+         $RuleName,
 
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,

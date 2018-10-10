@@ -54,7 +54,7 @@ function Search-SysmonEvent {
             }
             $SelectFilter = "`n*[System/Provider[@Name='microsoft-windows-sysmon'] and ($($idFilter))] "
         } else {
-            $SelectFilter = "`n*[System/Provider[@Name='microsoft-windows-sysmon'] and (System/EventID=$($EventId))] "
+            $SelectFilter = "`n(*[System/Provider[@Name='microsoft-windows-sysmon'] and (System/EventID=$($EventId))] )"
         }
 
 
@@ -64,7 +64,7 @@ function Search-SysmonEvent {
         if ($ParamHash['ChangeLogic']) {
            $logicOperator = 'or'
         }
-
+        $filterBlockCount = 0
         foreach ($Param in $FinalParams) {
             if ($param -notin $CommonParams) {
                $FieldValue = $ParamHash["$($param)"]
@@ -76,7 +76,11 @@ function Search-SysmonEvent {
                         if ($Params -contains 'Suppress') {
                             $filter = $filter + "`n (*[EventData[Data[@Name='$($Param)']='$($val)']]"
                         } else {
-                            $filter = $filter + "`n $( $logicOperator ) (*[EventData[Data[@Name='$($Param)']='$($val)']]"
+                            if ($filterBlockCount -gt 0) {
+                                $filter = $filter + "`n $( $logicOperator ) (*[EventData[Data[@Name='$($Param)']='$($val)']]"
+                            } else {
+                                $filter = $filter + "`n and (*[EventData[Data[@Name='$($Param)']='$($val)']]"
+                            }
                         }
                     }
                    $FilterCount += 1

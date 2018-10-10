@@ -1,7 +1,7 @@
 function Get-SysmonDriverLoadEvent {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon Driver Load events (EventId 6).
     .DESCRIPTION
         The driver loaded events provides information about a driver being loaded on the system. The configured hashes are provided as well as signature information. The signature is created asynchronously for performance reasons and indicates if the file was removed after loading.
     .EXAMPLE
@@ -11,6 +11,8 @@ function Get-SysmonDriverLoadEvent {
         System.IO.FileInfo
     .OUTPUTS
         Sysmon.EventRecord.DriverLoad
+    .NOTES
+        https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=90006
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -51,6 +53,11 @@ function Get-SysmonDriverLoadEvent {
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Hashes,
+
+        # Rule Name for filter that generated the event.
+        [Parameter(Mandatory = $false)]
+        [string[]]
+        $RuleName,
 
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,

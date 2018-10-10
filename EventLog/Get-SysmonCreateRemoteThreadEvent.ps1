@@ -2,16 +2,18 @@
 function Get-SysmonCreateRemoteThreadEvent {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon Remote Thread Creation events (EventId 8).
     .DESCRIPTION
         The CreateRemoteThread event detects when a process creates a thread in another process. This technique is used by malware to inject code and hide in other processes. The event indicates the source and target process. It gives information on the code that will be run in the new thread: StartAddress, StartModule and StartFunction. Note that StartModule and StartFunction fields are inferred, they might be empty if the starting address is outside loaded modules or known exported functions.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonCreateRemoteThreadEvent -SourceImage 'C:\Windows\System32\wbem\WmiPrvSE.exe' -Suppress
+        Find all events where the API CreateRemoteThread was used and the process image was not WmiPrvSE.exe.
     .INPUTS
         System.IO.FileInfo
     .OUTPUTS
         Sysmon.EventRecord.CreateRemoteThread
+    .NOTES
+        https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=90008
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -80,6 +82,11 @@ function Get-SysmonCreateRemoteThreadEvent {
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $StartFunction,
+
+        # Rule Name for filter that generated the event.
+        [Parameter(Mandatory = $false)]
+        [string[]]
+        $RuleName,
 
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,

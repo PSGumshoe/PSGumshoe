@@ -1,18 +1,18 @@
 function Get-SysmonFileCreateEvent {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon File Creation events (EventId 11).
     .DESCRIPTION
         File create operations are logged when a file is created or overwritten. This event is useful for monitoring autostart locations, like the Startup folder, as well as temporary and download directories, which are common places malware drops during initial infection.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonFileCreateEvent -Image 'C:\Windows\System32\certutil.exe'
+        Find events where certutil created a file on the machine.
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
+        Sysmon.EventRecord.FileCreate
     .NOTES
-        General notes
+        https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=90011
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -22,30 +22,34 @@ function Get-SysmonFileCreateEvent {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
+        # Process GUID for the process that created the file.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessGuid,
 
+        # Process Id for the process that created the file.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessId,
 
+        # Image path for the process that created the file.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Image,
 
-        [Parameter(Mandatory = $false,
-                   ValueFromPipelineByPropertyName = $true)]
-        [string[]]
-        $TargetProcessGuid,
-
+        # Name of the file that was created.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $TargetFileName,
+
+        # Rule Name for filter that generated the event.
+        [Parameter(Mandatory = $false)]
+        [string[]]
+        $RuleName,
 
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,

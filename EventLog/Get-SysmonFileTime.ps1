@@ -2,18 +2,18 @@
 function Get-SysmonFileTime {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon File Creation Time events (EventId 2).
     .DESCRIPTION
-        Long description
+        The change file creation time event is registered when a file creation time is explicitly modified by a process. This event helps tracking the real creation time of a file. Attackers may change the file creation time of a backdoor to make it look like it was installed with the operating system. Note that many processes legitimately change the creation time of a file; it does not necessarily indicate malicious activity.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonFileTime -Image 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe','C:\Windows\System32\RuntimeBroker.exe' -Suppress
+        Get all events where neither Chrome ot RuntimeBroker changed the creation time of an event.
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
+        Sysmon.EventRecord.FileCreateTime
     .NOTES
-        General notes
+        https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=90002
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -23,25 +23,35 @@ function Get-SysmonFileTime {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
+        # The GUID of the process that is making the file time change.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessGuid,
 
+        # The Id of the process that is making the file creation timestamp change.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessId,
 
+        # Full path of the process image that is making the file creation timestamp change
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Image,
 
+        # File whose time creation timestamp is being modified.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $TargetFileName,
+
+        # Rule Name for filter that generated the event.
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $RuleName,
 
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,

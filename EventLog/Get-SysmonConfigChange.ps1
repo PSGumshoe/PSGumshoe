@@ -36,6 +36,11 @@ function Get-SysmonConfigChange {
         [string[]]
         $ConfigurationFileHash,
 
+        # Rule Name for filter that generated the event.
+        [Parameter(Mandatory = $false)]
+        [string[]]
+        $RuleName,
+
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,
                    Position=0,
