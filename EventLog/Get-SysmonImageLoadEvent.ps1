@@ -2,18 +2,18 @@
 function Get-SysmonImageLoadEvent {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon Image Load events (EventId 7).
     .DESCRIPTION
-        Long description
+        The image loaded event logs when a module is loaded in a specific process.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonImageLoadEvent -ImageLoaded 'C:\Windows\System32\wshom.ocx'
+        Find all processes that loaded the wshom.ocx image that provides functions like wsh.shell to scripts and scriptlets.
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
+        Sysmon.EventRecord.ImageLoad
     .NOTES
-        General notes
+        https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=90007
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -49,41 +49,53 @@ function Get-SysmonImageLoadEvent {
         [string[]]
         $Signature,
 
+        # File Version field of the file metadata for the image loaded.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $FileVersion,
 
+        # Description field of the file metadata for the image loaded.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Description,
 
+        # Product field of the file metadata for the image loaded.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Product,
 
+        # Company field of the file metadata for the image loaded.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Company,
 
+        # Process Id for the process that loaded the image.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessId,
 
+        # Process GUID for the process that loaded the image.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessGuid,
 
-        # Imange hash.
+        # Hash for the image that was loaded.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Hashes,
+
+        # Rule Name for filter that generated the event.
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $RuleName,
 
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,

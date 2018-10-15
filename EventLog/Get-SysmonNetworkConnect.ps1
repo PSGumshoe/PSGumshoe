@@ -2,18 +2,18 @@
 function Get-SysmonNetworkConnect {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon Network Connect events (EventId 3).
     .DESCRIPTION
-        Long description
+        The network connection event logs TCP/UDP connections on the machine. It is disabled by default. Each connection is linked to a process through the ProcessId and ProcessGUID fields. The event also contains the source and destination host names IP addresses, port numbers and IPv6 status. Events are cached and logged every 15 seconds.
     .EXAMPLE
         PS C:\> <example usage>
         Explanation of what the example does
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
+        Sysmon.EventRecord.NetworkConnect
     .NOTES
-        General notes
+        https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=90003
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -23,88 +23,111 @@ function Get-SysmonNetworkConnect {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
+        # Process GUID for the process whose connection is logged.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessGuid,
 
+        # Pocess Id of the process whose connection is logged.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessId,
 
+        # Full path of process image that generated the connection.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Image,
 
+        # User under whose context the connection was made.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $User,
 
+        # Protocol type of the connection. Either TCP or UDP.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         [ValidateSet('UDP','TCP')]
         $Protocol,
 
+        # Was the connection initiated by the process.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
-        [string[]]
+        [string]
         [ValidateSet('true','false')]
         $Initiated,
 
+        # Is the source IP an IPv6 addres.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
-        [string[]]
+        [string]
+        [ValidateSet('true','false')]
         $SourceIsIpv6,
 
+        # Source IP address.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SourceIp,
 
+        # Source hostname.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SourceHostName,
 
+        # Source port number for the connection.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
-        [string[]]
+        [int[]]
         $SourcePort,
 
+        # Source port name for the connection.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SourcePortName,
 
+        # Destination port number for the connection.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $DestinationPort,
 
+        # Is the destination an IPv6 address.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         [ValidateSet('true','false')]
         $DestinationIsIpv6,
 
+        # Destination IP Address for the connection.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $DestinationIp,
 
+        # Destination hostname for the connection.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $DestinationHostname,
 
+        # Destination port name for the connection.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
-        [string[]]
+        [int[]]
         $DestinationPortName,
+
+        # Rule Name for filter that generated the event.
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $RuleName,
 
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,

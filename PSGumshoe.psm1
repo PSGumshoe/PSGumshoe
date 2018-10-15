@@ -59,6 +59,7 @@
 . $PSScriptRoot\EventLog\Get-SysmonWmiBinding.ps1
 . $PSScriptRoot\EventLog\Get-SysmonWmiConsumer.ps1
 . $PSScriptRoot\EventLog\Get-SysmonWmiFilter.ps1
+. $PSScriptRoot\EventLog\Get-SysmonNetworkConnect.ps1
 . $PSScriptRoot\EventLog\Search-SysmonEvent.ps1
 . $PSScriptRoot\EventLog\Get-SysmonProcessActivityEvent.ps1
 

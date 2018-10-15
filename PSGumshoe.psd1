@@ -51,7 +51,7 @@ FunctionsToExport = @(
     'Get-SysmonFileStreamHash',
     'Get-SysmonFileTime',
     'Get-SysmonImageLoadEvent',
-    'Get-SysmonNetworkConnect ',
+    'Get-SysmonNetworkConnect',
     'Get-SysmonProcessCreateEvent',
     'Get-SysmonProcessTerminateEvent',
     'Get-SysmonRawAccessRead ',

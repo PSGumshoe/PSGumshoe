@@ -62,6 +62,7 @@ function Search-SysmonEvent {
         # Manage change in Logic
         $logicOperator = 'and'
         if ($ParamHash['ChangeLogic']) {
+            Write-Verbose -Message 'Logic per field has been inverted.'
            $logicOperator = 'or'
         }
         $filterBlockCount = 0
@@ -80,6 +81,7 @@ function Search-SysmonEvent {
                                 $filter = $filter + "`n $( $logicOperator ) (*[EventData[Data[@Name='$($Param)']='$($val)']]"
                             } else {
                                 $filter = $filter + "`n and (*[EventData[Data[@Name='$($Param)']='$($val)']]"
+                                $filterBlockCount += 1
                             }
                         }
                     }

@@ -1,20 +1,16 @@
 function Get-SysmonProcessActivityEvent {
     <#
     .SYNOPSIS
-        Short description
+        Get all or a specific set of Sysmon events for a given Process GUID.
     .DESCRIPTION
-        Long description
+        Get all or a specific set of Sysmon events for a given Process GUID.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonProcessActivityEvent -ProcessGuid '{278123BE-DE0D-5BBD-0000-0010D45C5E32}'
+        Find all events related to the specified process GUID.
     .INPUTS
-        Inputs (if any)
-    .OUTPUTS
-        Output (if any)
-    .NOTES
-        General notes
+        System.IO.FileInfo
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
         # Log name for where the events are stored.
         [Parameter(Mandatory = $false,
@@ -81,11 +77,6 @@ function Get-SysmonProcessActivityEvent {
         [Parameter(Mandatory = $false)]
         [datetime]
         $EndTime,
-
-        # Changes the default logic for matching fields from 'and' to 'or'.
-        [Parameter(Mandatory = $false)]
-        [switch]
-        $ChangeLogic,
 
         # Changes the query action from inclusion to exclusion when fields are matched.
         [Parameter(Mandatory = $false)]
