@@ -95,13 +95,13 @@ function Search-EventLogEventXML {
             }
         }
 
-        if ($StartTime -ne $null) {
+        if ($null -eq $StartTime) {
             $StartTime = $StartTime.ToUniversalTime()
             $StartTimeFormatted = $StartTime.ToString("s",[cultureinfo]::InvariantCulture)+"."+ ($StartTime.Millisecond.ToString("d3",[cultureinfo]::InvariantCulture))+"z"
             $filter = $filter + "`n and *[System/TimeCreated[@SystemTime&gt;='$( $StartTimeFormatted )']]"
         }
 
-        if ($EndTime -ne $null) {
+        if ($null -eq $EndTime) {
             $EndTime = $EndTime.ToUniversalTime()
             $EndTimeFormatted = $EndTime.ToString("s",[cultureinfo]::InvariantCulture)+"."+ ($EndTime.Millisecond.ToString("d3",[cultureinfo]::InvariantCulture))+"z"
             $filter = $filter + "`n and *[System/TimeCreated[@SystemTime&lt;='$( $EndTimeFormatted )']]"
@@ -156,7 +156,7 @@ function Search-EventLogEventXML {
        switch ($PSCmdlet.ParameterSetName) {
            'Remote' {
                $ComputerName | ForEach-Object {
-                   if ($Credential -eq $null) {
+                   if ($null -eq $Credential) {
                        if ($MaxEvents -gt 0) {
                            Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
                        } else {
