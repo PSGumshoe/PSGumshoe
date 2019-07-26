@@ -4,7 +4,7 @@
 RootModule = 'PSGumshoe.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0'
+ModuleVersion = '1.1'
 
 # ID used to uniquely identify this module
 GUID = '6f0aaa95-8bc2-43ef-b06c-440ba94a7e5d'
@@ -62,7 +62,17 @@ FunctionsToExport = @(
     'Get-SysmonWmiBinding',
     'Get-SysmonWmiConsumer',
     'Get-SysmonWmiFilter',
-    'Get-SysmonProcessActivityEvent'
+    'Get-SysmonProcessActivityEvent',
+    'Get-EventSystemLogon',
+    'Get-EventSystemLogoff',
+    'Get-EventTerminalLogon',
+    'Get-EventTerminalLogoff',
+    'Get-EventScheduledTaskStart',
+    'Get-EventScheduledTaskProcess',
+    'Get-EventScheduledTaskStop',
+    'Get-EventScheduledTaskComplete',
+    'Get-EventBitsTransferComplete',
+    'Get-EventBitsTransferStart'
 )
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.

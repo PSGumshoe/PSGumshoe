@@ -62,6 +62,20 @@
 . $PSScriptRoot\EventLog\Get-SysmonNetworkConnect.ps1
 . $PSScriptRoot\EventLog\Search-SysmonEvent.ps1
 . $PSScriptRoot\EventLog\Get-SysmonProcessActivityEvent.ps1
+. $PSScriptRoot\Search-EventLogEventData.ps1
+. $PSScriptRoot\Search-EventLogEventXML.ps1
+. $PSScriptRoot\ConvertFrom-EventLogonRecord.ps1
+. $PSScriptRoot\ConvertFrom-EventEventXMLRecord.ps1
+. $PSScriptRoot\Get-EventSystemLogon.ps1
+. $PSScriptRoot\Get-EventSystemLogoff.ps1
+. $PSScriptRoot\Get-EventTerminalLogon.ps1
+. $PSScriptRoot\Get-EventTerminalLogoff.ps1
+. $PSScriptRoot\Get-EventScheduledTaskStart.ps1
+. $PSScriptRoot\Get-EventScheduledTaskProcess.ps1
+. $PSScriptRoot\Get-EventScheduledTaskStop.ps1
+. $PSScriptRoot\Get-EventScheduledTaskComplete.ps1
+. $PSScriptRoot\Get-EventBitsTransferComplete.ps1
+. $PSScriptRoot\Get-EventBitsTransferStart.ps1
 
 
 #region PSReflect
