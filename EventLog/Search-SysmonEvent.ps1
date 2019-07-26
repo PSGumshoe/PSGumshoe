@@ -115,10 +115,10 @@ function Search-SysmonEvent {
                     $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($SelectFilter + $filter)`n</Select>`n</Query>"
                 } else {
                     if ($Params -contains 'Suppress') {
-                        $BaseFilter = "<QueryList>`n<Query Id='0' Path='file://$($_)'>`n"
-                        $BaseFilter += "<Select Path='$($LogName)'>$($SelectFilter)`n</Select>`n"
-                        $BaseFilter += "<Suppress Path='$($LogName)'>$($filter)`n</Suppress>`n"
-                        $BaseFilter += "</Query>`n</QueryList>"
+                        $Querys = "<QueryList>`n<Query Id='0' Path='file://$($_)'>`n"
+                        $Querys += "<Select Path='file://$($_)'>$($SelectFilter)`n</Select>`n"
+                        $Querys += "<Suppress Path='file://$($_)'>$($filter)`n</Suppress>`n"
+                        $Querys += "</Query>`n</QueryList>"
 
                     } else {
                         $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($SelectFilter + $filter)`n</Select>`n</Query>"
@@ -154,24 +154,24 @@ function Search-SysmonEvent {
                $ComputerName | ForEach-Object {
                    if ($Credential -eq $null) {
                        if ($MaxEvents -gt 0) {
-                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ | ConvertFrom-SysmonEventLogRecord
+                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
                        } else {
-                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_| ConvertFrom-SysmonEventLogRecord
+                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
                        }
                    } else {
                        if ($MaxEvents -gt 0) {
-                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential | ConvertFrom-SysmonEventLogRecord
+                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue  | ConvertFrom-SysmonEventLogRecord
                        } else {
-                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential | ConvertFrom-SysmonEventLogRecord
+                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
                        }
                    }
                }
            }
            Default {
                if ($MaxEvents -gt 0) {
-                   Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents | ConvertFrom-SysmonEventLogRecord
+                   Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue  -MaxEvents $MaxEvents | ConvertFrom-SysmonEventLogRecord
                } else {
-                   Get-WinEvent -FilterXml $BaseFilter | ConvertFrom-SysmonEventLogRecord
+                   Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
                }
            }
        }
