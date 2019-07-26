@@ -119,10 +119,10 @@ function Search-EventLogEventData {
                     $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($SelectFilter + $filter)`n</Select>`n</Query>"
                 } else {
                     if ($Params -contains 'Suppress') {
-                        $BaseFilter = "<QueryList>`n<Query Id='0' Path='file://$($_)'>`n"
-                        $BaseFilter += "<Select Path='$($LogName)'>$($SelectFilter)`n</Select>`n"
-                        $BaseFilter += "<Suppress Path='$($LogName)'>$($filter)`n</Suppress>`n"
-                        $BaseFilter += "</Query>`n</QueryList>"
+                        $Querys = "`n<Query Id='0' Path='file://$($_)'>`n"
+                        $Querys += "<Select Path='$($LogName)'>$($SelectFilter)`n</Select>`n"
+                        $Querys += "<Suppress Path='$($LogName)'>$($filter)`n</Suppress>`n"
+                        $Querys += "</Query>`n"
 
                     } else {
                         $Querys += "`n<Query Id='$($QueryId)' Path='file://$($_)'>`n<Select>$($SelectFilter + $filter)`n</Select>`n</Query>"
