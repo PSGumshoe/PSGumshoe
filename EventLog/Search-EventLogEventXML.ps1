@@ -95,13 +95,13 @@ function Search-EventLogEventXML {
             }
         }
 
-        if ($null -eq $StartTime) {
+        if ($StartTime -ne $null) {
             $StartTime = $StartTime.ToUniversalTime()
             $StartTimeFormatted = $StartTime.ToString("s",[cultureinfo]::InvariantCulture)+"."+ ($StartTime.Millisecond.ToString("d3",[cultureinfo]::InvariantCulture))+"z"
             $filter = $filter + "`n and *[System/TimeCreated[@SystemTime&gt;='$( $StartTimeFormatted )']]"
         }
 
-        if ($null -eq $EndTime) {
+        if ($EndTime -ne $null) {
             $EndTime = $EndTime.ToUniversalTime()
             $EndTimeFormatted = $EndTime.ToString("s",[cultureinfo]::InvariantCulture)+"."+ ($EndTime.Millisecond.ToString("d3",[cultureinfo]::InvariantCulture))+"z"
             $filter = $filter + "`n and *[System/TimeCreated[@SystemTime&lt;='$( $EndTimeFormatted )']]"

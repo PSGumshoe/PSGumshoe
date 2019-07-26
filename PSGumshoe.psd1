@@ -62,6 +62,7 @@ FunctionsToExport = @(
     'Get-SysmonWmiBinding',
     'Get-SysmonWmiConsumer',
     'Get-SysmonWmiFilter',
+    'Get-SysmonDNSQuery',
     'Get-SysmonProcessActivityEvent',
     'Get-EventSystemLogon',
     'Get-EventSystemLogoff',

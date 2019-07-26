@@ -60,6 +60,7 @@
 . $PSScriptRoot\EventLog\Get-SysmonWmiConsumer.ps1
 . $PSScriptRoot\EventLog\Get-SysmonWmiFilter.ps1
 . $PSScriptRoot\EventLog\Get-SysmonNetworkConnect.ps1
+. $PSScriptRoot\EventLog\Get-SysmonDNSQuery.ps1
 . $PSScriptRoot\EventLog\Search-SysmonEvent.ps1
 . $PSScriptRoot\EventLog\Get-SysmonProcessActivityEvent.ps1
 . $PSScriptRoot\EventLog\Search-EventLogEventData.ps1

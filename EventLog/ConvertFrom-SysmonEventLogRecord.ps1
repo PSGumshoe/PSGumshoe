@@ -44,6 +44,7 @@ function ConvertFrom-SysmonEventLogRecord {
             '19' = 'WmiFilter'
             '20' = 'WmiConsumer'
             '21' = 'WmiBinding'
+            '22' = 'DNSQuery'
             '255' = 'Error'
         }
     }
