@@ -29,7 +29,7 @@ function Get-SysmonCreateRemoteThreadEvent {
         [string[]]
         $SourceProcessGuid,
 
-        # the PID of the process that is creating the remote thread.
+        # The PID of the process that is creating the remote thread.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
