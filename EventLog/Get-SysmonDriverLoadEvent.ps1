@@ -13,19 +13,6 @@ function Get-SysmonDriverLoadEvent {
         EventId         : 6
         EventType       : DriverLoad
         Computer        : DESKTOP-4TVLVMD
-        EventRecordID   : 10562478
-        RuleName        :
-        UtcTime         : 2019-07-27 02:33:33.956
-        ImageLoaded     : C:\Users\carlos\Desktop\mimikatz\x64\mimidrv.sys
-        Hashes          : SHA1=DAC68B8EE002D5BB61BE3D59908A61A26EFB7C09,MD5=26AEDC10D4215BA997495D3A68355F4A,IMPHASH=059C6BD842
-                        85F4960E767F032B33F19B
-        Signed          : false
-        Signature       :
-        SignatureStatus : Expired
-
-        EventId         : 6
-        EventType       : DriverLoad
-        Computer        : DESKTOP-4TVLVMD
         EventRecordID   : 10562189
         RuleName        :
         UtcTime         : 2019-07-27 02:27:51.075

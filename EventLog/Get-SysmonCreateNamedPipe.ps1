@@ -7,6 +7,56 @@ function Get-SysmonCreateNamedPipe {
     .EXAMPLE
         PS C:\> Get-SysmonCreatePipe -ComputerName wec1.contoso.com -LogName "Forwarded Events"
         Query remote Windows Event Collector server for Named Pipe creation events.
+
+    .EXAMPLE
+
+        PS C:\> Get-SysmonCreateNamedPipe  -RuleName "PSExec Execution"
+
+        EventId       : 17
+        EventType     : CreatePipe
+        Computer      : DESKTOP-3MD5SJ5
+        EventRecordID : 1390
+        RuleName      : PSExec Execution
+        UtcTime       : 2019-07-26 21:29:58.188
+        ProcessGuid   : {1FE293DA-70D6-5D3B-0000-00105413F501}
+        ProcessId     : 1072
+        PipeName      : \PSEXESVC-DESKTOP-3MD5SJ5-6620-stderr
+        Image         : C:\Windows\PSEXESVC.exe
+
+        EventId       : 17
+        EventType     : CreatePipe
+        Computer      : DESKTOP-3MD5SJ5
+        EventRecordID : 1389
+        RuleName      : PSExec Execution
+        UtcTime       : 2019-07-26 21:29:58.187
+        ProcessGuid   : {1FE293DA-70D6-5D3B-0000-00105413F501}
+        ProcessId     : 1072
+        PipeName      : \PSEXESVC-DESKTOP-3MD5SJ5-6620-stdout
+        Image         : C:\Windows\PSEXESVC.exe
+
+        EventId       : 17
+        EventType     : CreatePipe
+        Computer      : DESKTOP-3MD5SJ5
+        EventRecordID : 1388
+        RuleName      : PSExec Execution
+        UtcTime       : 2019-07-26 21:29:58.187
+        ProcessGuid   : {1FE293DA-70D6-5D3B-0000-00105413F501}
+        ProcessId     : 1072
+        PipeName      : \PSEXESVC-DESKTOP-3MD5SJ5-6620-stdin
+        Image         : C:\Windows\PSEXESVC.exe
+
+        EventId       : 17
+        EventType     : CreatePipe
+        Computer      : DESKTOP-3MD5SJ5
+        EventRecordID : 1386
+        RuleName      : PSExec Execution
+        UtcTime       : 2019-07-26 21:29:58.058
+        ProcessGuid   : {1FE293DA-70D6-5D3B-0000-00105413F501}
+        ProcessId     : 1072
+        PipeName      : \PSEXESVC
+        Image         : C:\Windows\PSEXESVC.exe
+
+        Find events for rule name "PSExec Execution"
     .INPUTS
         System.IO.FileInfo
     .OUTPUTS
