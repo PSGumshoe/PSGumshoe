@@ -1,18 +1,32 @@
 function Get-SysmonDNSQuery {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon Access Procces EventLog Events (EventId 22).
     .DESCRIPTION
-        Long description
+        Get Sysmon DNS Query events either locally or remotely from a specified location.
+        These events have an EventID of 10 and are for tracking DNS queries performed by processes.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonDNSQuery | Group-Object -Property query | Select-Object -Property count,name
+        Get a list of processes and count of DNS queries logged.
+    .EXAMPLE
+        PS C:\> Get-SysmonDNSQuery | Group-Object -Property query | Select-Object -Property count,name
+        Get a list of unique queries logged and a count for each.
+    .EXAMPLE
+        PS C:\> Get-SysmonDNSQuery -QueryStatus 0 -QueryName wpad
+        Get a list of successful WPAD resolutions.
+    .EXAMPLE
+        PS C:\> Get-SysmonDNSQuery -QueryStatus 9003 
+        Get a list of queries for where the DNS Name does not exist.
+    .EXAMPLE
+        PS C:\> Get-SysmonDNSQuery -QueryStatus 9501 
+        Get a list of queries for where no record was found.
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
+    Sysmon.EventRecord.DNSQuery
     .NOTES
-        General notes
+        The number of events for this type may be a high one if there is no proper filtering in place for collection. 
+        DNS Status List https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--9000-11999-
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -22,31 +36,37 @@ function Get-SysmonDNSQuery {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
+        # The PID of the process that is performing the query.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [int[]]
         $ProcessId,
 
+        # The unique Process GUID of the process that is performing the query.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessGuid,
 
+        # Rule Name for filter that generated the event.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $RuleName,
 
+        # FQDN that was queried.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $QueryName,
 
+        # Status of the query perfomed.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $QueryStatus,
 
+        # Image of the process that perforemd the query.
         [Parameter(Mandatory = $false,
         ValueFromPipelineByPropertyName = $true)]
         [string[]]
