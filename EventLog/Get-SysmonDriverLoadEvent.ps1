@@ -3,10 +3,39 @@ function Get-SysmonDriverLoadEvent {
     .SYNOPSIS
         Get Sysmon Driver Load events (EventId 6).
     .DESCRIPTION
-        The driver loaded events provides information about a driver being loaded on the system. The configured hashes are provided as well as signature information. The signature is created asynchronously for performance reasons and indicates if the file was removed after loading.
+        The driver loaded events provides information about a driver being loaded on the system. 
+        The configured hashes are provided as well as signature information. The signature is 
+        created asynchronously for performance reasons and indicates if the file was removed 
+        after loading.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonDriverLoadEvent -Path ..\Desktop\sysmondriver.evtx  -SignatureStatus Expired
+
+        EventId         : 6
+        EventType       : DriverLoad
+        Computer        : DESKTOP-4TVLVMD
+        EventRecordID   : 10562478
+        RuleName        :
+        UtcTime         : 2019-07-27 02:33:33.956
+        ImageLoaded     : C:\Users\carlos\Desktop\mimikatz\x64\mimidrv.sys
+        Hashes          : SHA1=DAC68B8EE002D5BB61BE3D59908A61A26EFB7C09,MD5=26AEDC10D4215BA997495D3A68355F4A,IMPHASH=059C6BD842
+                        85F4960E767F032B33F19B
+        Signed          : false
+        Signature       :
+        SignatureStatus : Expired
+
+        EventId         : 6
+        EventType       : DriverLoad
+        Computer        : DESKTOP-4TVLVMD
+        EventRecordID   : 10562189
+        RuleName        :
+        UtcTime         : 2019-07-27 02:27:51.075
+        ImageLoaded     : C:\mimi\x64\mimidrv.sys
+        Hashes          : SHA1=02A9314109E47C5CE52FA553EA57070BF0F8186A
+        Signed          : false
+        Signature       :
+        SignatureStatus : Expired
+
+        Find drivers loaded with expired signature.
     .INPUTS
         System.IO.FileInfo
     .OUTPUTS
@@ -38,7 +67,7 @@ function Get-SysmonDriverLoadEvent {
         # If the signature on the driver is valid or not
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('Valid','Invalid')]
+        [ValidateSet('Valid','Expired')]
         [string]
         $SignatureStatus,
 
