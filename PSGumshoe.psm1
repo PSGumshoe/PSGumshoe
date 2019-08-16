@@ -77,6 +77,7 @@
 . $PSScriptRoot\EventLog\Get-EventScheduledTaskComplete.ps1
 . $PSScriptRoot\EventLog\Get-EventBitsTransferComplete.ps1
 . $PSScriptRoot\EventLog\Get-EventBitsTransferStart.ps1
+. $PSScriptRoot\EventLog\Get-SysmonAccessMask.ps1
 
 
 #region PSReflect
