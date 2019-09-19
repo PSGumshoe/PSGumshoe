@@ -75,13 +75,17 @@ function Get-SysmonRuleHash {
             default {}            
            }   
 
-           $objProps = [ordered]@{
-               'ComputerName' = $ComputerName
-               'DriverName' = $DriverName
-               'Hash' = ([System.BitConverter]::ToString($hasher.ComputeHash($result.uValue))).Replace("-",'')
-           } 
-           
-           [PSCustomObject]$objProps
+           if ($result.returnValue -eq 0) {
+                $objProps = [ordered]@{
+                    'ComputerName' = $ComputerName
+                    'DriverName' = $DriverName
+                    'Hash' = ([System.BitConverter]::ToString($hasher.ComputeHash($result.uValue))).Replace("-",'')
+                } 
+                
+                [PSCustomObject]$objProps
+            } else {
+                Write-Error -Message "No ruleset found in $($ComputerName) for driver $( $DriverName )"
+            }
     }
     
     end {
