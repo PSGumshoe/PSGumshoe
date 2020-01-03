@@ -4,7 +4,7 @@
 RootModule = 'PSGumshoe.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.2'
+ModuleVersion = '1.3'
 
 # ID used to uniquely identify this module
 GUID = '6f0aaa95-8bc2-43ef-b06c-440ba94a7e5d'
@@ -75,7 +75,11 @@ FunctionsToExport = @(
     'Get-EventBitsTransferComplete',
     'Get-EventBitsTransferStart',
     'Get-SysmonAccessMask',
-    'Get-SysmonRuleHash'
+    'Get-SysmonRuleHash',
+    # CIM Functions
+    'Get-PsgLogonSession',
+    'Get-PsgProcessLogonSession',
+    'Get-PsgProcess'
 )
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.

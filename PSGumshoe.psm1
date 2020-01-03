@@ -81,6 +81,14 @@
 . $PSScriptRoot\EventLog\Get-SysmonRuleHash.ps1
 
 
+# CIM Collection Functions
+#-------------------------
+
+. $PSScriptRoot\CIM\Get-PsgLogonSession.ps1
+. $PSScriptRoot\CIM\Get-PsgProcessLogonSession.ps1
+. $PSScriptRoot\CIM\Get-PsgProcess.ps1
+
+
 #region PSReflect
 
 function New-InMemoryModule {
