@@ -87,6 +87,7 @@
 . $PSScriptRoot\CIM\Get-PsgLogonSession.ps1
 . $PSScriptRoot\CIM\Get-PsgProcessLogonSession.ps1
 . $PSScriptRoot\CIM\Get-PsgProcess.ps1
+. $PSScriptRoot\CIM\Get-PsgComputerInfo.ps1
 
 
 #region PSReflect
