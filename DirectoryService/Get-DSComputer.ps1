@@ -103,6 +103,16 @@ function Get-DSComputer {
         $LogOnBefore,
         
         [Parameter(Mandatory=$false,
+            HelpMessage='Date to search for when the computer password was set after this date.')]
+        [datetime]
+        $PwSetAfter,
+
+        [Parameter(Mandatory=$false,
+            HelpMessage='Date to search for when the computer password was set before this date.')]
+        [datetime]
+        $PwSetBefore,
+
+        [Parameter(Mandatory=$false,
                    HelpMessage='Filter by the specified operating systems.')]
         [SupportsWildcards()]
         [string[]]
@@ -151,8 +161,16 @@ function Get-DSComputer {
             $TempFilter = "$($TempFilter)(whencreated<=$($CreatedBefore.ToString('yyyyMMddhhmmss.sZ')))"
         }
         
+        # Fileter for password last set
+        if ($PwSetAfter -and $PwSetBefore) {
+            $TempFilter = "$($TempFilter)(pwdlastset>=$($PwSetAfter.ToFileTimeUTC()))(pwdlastset<=$($PwSetBefore.ToFileTimeUTC()))"
+        } elseif ($PwSetAfter) {
+            $TempFilter = "$($TempFilter)(pwdlastset>=$($PwSetAfter.ToFileTimeUTC()))"
+        } elseif ($PwSetBefore) {
+            $TempFilter = "$($TempFilter)(pwdlastset<=$($PwSetBefore.ToFileTimeUTC()))"
+        }
+
         # Fileter for loggon time
-         # Fileter for loggon time
         if ($LogOnAfter -and $LogOnBefore) {
             $TempFilter = "$($TempFilter)(lastlogon>=$($LogOnAfter.ToFileTimeUTC()))(lastlogon<=$($LogOnBefore.ToFileTimeUTC()))"
         } elseif ($LogOnAfter) {
