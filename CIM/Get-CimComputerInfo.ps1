@@ -1,11 +1,11 @@
-function Get-PsgComputerInfo {
+function Get-CimComputerInfo {
     <#
     .SYNOPSIS
         Queries via CIM computer and operating system information.
     .DESCRIPTION
         Queries via CIM computer and operating system information. Information is pulled form the Win32_OperatingSystem and Win32_ComputerSystem classes.
     .EXAMPLE
-        PS C:\>  Get-PsgComputerInfo
+        PS C:\>  Get-CimComputerInfo
 
 
         ComputerName              : DESKTOP-4TVLVMD
@@ -56,7 +56,7 @@ function Get-PsgComputerInfo {
          # If no CIMSession is provided we create one for localhost.
          if ($null -eq $CimSession -or $CimSession.Count -eq 0) {
             $sessop = New-CimSessionOption -Protocol Dcom
-            $CimSession += New-CimSession -ComputerName localhost -SessionOption $sessop
+            $CimSession += New-CimSession -ComputerName $env:COMPUTERNAME -SessionOption $sessop
         }
 
         

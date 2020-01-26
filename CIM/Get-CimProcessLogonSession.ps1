@@ -55,7 +55,7 @@ function Get-PsgProcessLogonSession {
         # If no CIMSession is provided we create one for localhost.
         if ($null -eq $CimSession) {
             $sessop = New-CimSessionOption -Protocol Dcom
-            $CimSession += New-CimSession -ComputerName localhost -SessionOption $sessop
+            $CimSession += New-CimSession -ComputerName $env:COMPUTERNAME -SessionOption $sessop
         }
 
         foreach($p in $ProcessId) {

@@ -1,4 +1,4 @@
-function Get-PsgProcess {
+function Get-CimProcess {
     <#
     .SYNOPSIS
         Query the CIM Object database for a list of processes on a target host.
@@ -6,7 +6,7 @@ function Get-PsgProcess {
         Query the CIM Object database for a list of processes on a target host. The function allows for
         filtering so as to better target the desired processes.
     .EXAMPLE
-        PS C:\> Get-PsgProcess -CimSession (Get-CimSession -Id 2) -ExecutablePath "C:\\User" 
+        PS C:\> Get-CimProcess -CimSession (Get-CimSession -Id 2) -ExecutablePath "C:\\User" 
 
 
         ProcessId       : 4560
@@ -29,12 +29,12 @@ function Get-PsgProcess {
 
         Enumerate processes running under C:\Users folder.
     .EXAMPLE
-        PS C:\> Get-PsgProcess -CimSession (Get-CimSession -Id 2) -CreatedBefore "9/1/2019" -CreatedAfter "8/20/2019"
+        PS C:\> Get-CimProcess -CimSession (Get-CimSession -Id 2) -CreatedBefore "9/1/2019" -CreatedAfter "8/20/2019"
 
         Find processes that where created inside a given time window.
 
     .EXAMPLE
-        PS C:\>  Get-PsgProcess -CimSession (Get-CimSession -Id 2) -SessionId 0 -name pse   
+        PS C:\>  Get-CimProcess -CimSession (Get-CimSession -Id 2) -SessionId 0 -name pse   
 
 
         ProcessId       : 4800
@@ -48,7 +48,7 @@ function Get-PsgProcess {
 
         Find processes started by SYSTEM (Always session ID 0) whose name contains *pse*
     .EXAMPLE
-        PS C:\> Get-PsgProcess -CimSession (Get-CimSession -Id 2) -name conhost,powershell,cmd  
+        PS C:\> Get-CimProcess -CimSession (Get-CimSession -Id 2) -name conhost,powershell,cmd  
 
         Query for all terminal processes on a system. 
 
@@ -64,16 +64,19 @@ function Get-PsgProcess {
         # Name or part of the process name to  query for.
         [Parameter(Mandatory=$false,
             ValueFromPipelineByPropertyName = $true)]
+        [SupportsWildcards()]
         [string[]]
         $Name,
 
         # Commandline or part of a commandline to query for.
         [Parameter(mandatory=$false)]
+        [SupportsWildcards()]
         [string[]]
         $commandline,
 
         # Path or part of the path of the executable to query for.
         [Parameter(mandatory=$false)]
+        [SupportsWildcards()]
         [string[]]
         $ExecutablePath,
 
@@ -172,6 +175,12 @@ function Get-PsgProcess {
     )
     
     begin {
+
+        # If no CIMSession is provided we create one for localhost.
+        if ($null -eq $CimSession -or $CimSession.Count -eq 0) {
+            $sessop = New-CimSessionOption -Protocol Dcom
+            $CimSession += New-CimSession -ComputerName $Env:Computername -SessionOption $sessop
+        }
        
         # Build WQL Query
         $PassedParams = $PSBoundParameters.Keys
@@ -180,26 +189,39 @@ function Get-PsgProcess {
             "Name" {
                 $nFilter = @()
                 foreach($n in $name){
-                    $nfilter += "Name LIKE '%$($n)%'"  
+                    if ($n -match "\*") {
+                       $nfilter += "Name LIKE '$($n.Replace('*','%'))'"
+                    } else {
+                       $nfilter += "Name = '$($n)'"
+                    }  
                 }
                 $filter += "($($nfilter -join " OR "))"
             }
 
-            "Commandline" { 
+            "Commandline" {
                 $cFilter = @()
-                foreach($c in $Commandline){
-                    $cfilter += "Commandline LIKE '%$($c)%'"  
+                foreach($n in $Commandline){
+                    if ($n -match "\*") {
+                       $cFilter += "Commandline LIKE '$($n.Replace('*','%'))'"
+                    } else {
+                       $cFilter += "Commandline = '$($n)'"
+                    }  
                 }
-                $filter += "($($cfilter -join " OR "))"
+                $filter += "($($cFilter -join " OR "))"
             }
 
-            "ExecutablePath"  { 
+            "ExecutablePath" {
                 $eFilter = @()
-                foreach($e in $ExecutablePath){
-                    $efilter += "ExecutablePath LIKE '%$($e)%'"  
+                foreach($n in $ExecutablePath){
+                    if ($n -match "\*") {
+                       $eFilter += "ExecutablePath LIKE '$($n.Replace('*','%'))'"
+                    } else {
+                       $eFilter += "ExecutablePath = '$($n)'"
+                    }  
                 }
-                $filter += "($($efilter -join " OR "))"
+                $filter += "($($eFilter -join " OR "))"
             }
+
             "ProcessId" { 
                 $pidFilter = @()
                 foreach($pid in $ProcessId){
@@ -249,46 +271,26 @@ function Get-PsgProcess {
     }
     
     process {
-
-        if ($CimSession.Count -gt 0 ) {
-            foreach ($Session in $CimSession) {
-                Get-CimInstance -Query $Wql -CimSession $Session | ForEach-Object {
-                    $objectProps = [ordered]@{}
-                    foreach($p in $Property) {
-                        $objectProps.Add($p, $_."$($p)")
-                    }
-                    $objectProps.Add('ComputerName', $Session.ComputerName)
-                    
-                    if($GetOwner) {
-                        $ownerInfo = Invoke-CimMethod -InputObject $_ -MethodName GetOwner
-                        if ($ownerInfo.ReturnValue -eq 0) {
-                            $objectProps.Add('Owner', "$($ownerInfo.Domain)\$($ownerInfo.User)")
-                        } else {
-                            $objectProps.Add('Owner', "")
-                        }
-                    }
-
-                    
-                    $obj = [PSCustomObject]$objectProps
-                    $obj.pstypenames.insert(0,'PSGumshoe.Process')
-                    $obj
+        Get-CimInstance -Query $Wql -CimSession $CimSession | ForEach-Object {
+            $objectProps = [ordered]@{}
+            foreach($p in $Property) {
+                $objectProps.Add($p, $_."$($p)")
+            }
+            $objectProps.Add('ComputerName', $_.PSComputerName)
+            
+            if($GetOwner) {
+                $ownerInfo = Invoke-CimMethod -InputObject $_ -MethodName GetOwner
+                if ($ownerInfo.ReturnValue -eq 0) {
+                    $objectProps.Add('Owner', "$($ownerInfo.Domain)\$($ownerInfo.User)")
+                } else {
+                    $objectProps.Add('Owner', "")
                 }
             }
-        } else {
-            Get-CimInstance -Query $Wql | ForEach-Object {
-                $objectProps = [ordered]@{}
-                foreach($p in $Property) {
-                    $objectProps.Add($p, $_."$($p)")
-                    if ($p -eq 'ProcessID') {
-                        $objectProps.Add('ProcessIdHex', "0x$("{0:x}" -f $_.ProcessId)")
-                    }
-                }
-                $objectProps.Add('ComputerName', $_.CSName)
-                $obj = [PSCustomObject]$objectProps
-                $obj.pstypenames.insert(0,'PSGumshoe.Process')
-                $obj
-            }
-        }
+ 
+            $obj = [PSCustomObject]$objectProps
+            $obj.pstypenames.insert(0,'PSGumshoe.Process')
+            $obj
+        }    
     }
     
     end {

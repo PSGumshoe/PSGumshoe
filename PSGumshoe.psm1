@@ -84,10 +84,11 @@
 # CIM Collection Functions
 #-------------------------
 
-. $PSScriptRoot\CIM\Get-PsgLogonSession.ps1
-. $PSScriptRoot\CIM\Get-PsgProcessLogonSession.ps1
-. $PSScriptRoot\CIM\Get-PsgProcess.ps1
-. $PSScriptRoot\CIM\Get-PsgComputerInfo.ps1
+. $PSScriptRoot\CIM\Get-CimLogonSession.ps1
+. $PSScriptRoot\CIM\Get-CimProcessLogonSession.ps1
+. $PSScriptRoot\CIM\Get-CimProcess.ps1
+. $PSScriptRoot\CIM\Get-CimComputerInfo.ps1
+. $PSScriptRoot\CIM\Get-CimDNSCache.ps1
 
 
 #region PSReflect

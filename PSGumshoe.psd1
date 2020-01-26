@@ -77,10 +77,11 @@ FunctionsToExport = @(
     'Get-SysmonAccessMask',
     'Get-SysmonRuleHash',
     # CIM Functions
-    'Get-PsgLogonSession',
-    'Get-PsgProcessLogonSession',
-    'Get-PsgProcess',
-    'Get-PsgComputerInfo'
+    'Get-CimLogonSession',
+    'Get-CimProcessLogonSession',
+    'Get-CimProcess',
+    'Get-CimComputerInfo',
+    'Get-CimDNSCache'
 )
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.

@@ -5,7 +5,7 @@ function Get-PsgLogonSession {
     .DESCRIPTION
         Query the CIM Object database for a list of Logon Sessions and account related to session on a target host.
     .EXAMPLE
-        PS C:\> Get-PsgLogonSession -IncludeProcess                                            
+        PS C:\> Get-CimLogonSession -IncludeProcess                                            
 
 
         StartTime             : 12/21/2019 10:00:14 PM
@@ -213,7 +213,7 @@ function Get-PsgLogonSession {
     .INPUTS
         Microsoft.Management.Infrastructure.CimSession
     .OUTPUTS
-        LogonSession
+        PSGumshoe.LogonSession
     .NOTES
         General notes
     #>
@@ -233,15 +233,15 @@ function Get-PsgLogonSession {
     )
     
     begin {
-    
-    }
-    
-    process {
         # If no CIMSession is provided we create one for localhost.
         if ($null -eq $CimSession -or $CimSession.Count -eq 0) {
             $sessop = New-CimSessionOption -Protocol Dcom
-            $CimSession += New-CimSession -ComputerName localhost -SessionOption $sessop
+            $CimSession += New-CimSession -ComputerName $env:COMPUTERNAME -SessionOption $sessop
         }
+    }
+    
+    process {
+        
 
         foreach($s in $CimSession) {
             $Wql = "SELECT * FROM Win32_LogonSession" 
