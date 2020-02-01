@@ -23,14 +23,24 @@ function Get-CimDnsCache {
     .OUTPUTS
         PSGumshoe.Process
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "Local")]
     param (
         # CIMSession to perform query against
         [Parameter(ValueFromPipelineByPropertyName = $True,
-            ValueFromPipeline = $true)]
+            ValueFromPipeline = $true,
+            ParameterSetName = 'CimInstance')]
         [Alias('Session')]
         [Microsoft.Management.Infrastructure.CimSession[]]
         $CimSession,
+
+        # Specifies the computer on which you want to run the CIM operation. You can specify a fully qualified
+        # domain name (FQDN) a NetBIOS name, or an IP address.
+        [Parameter(ValueFromPipelineByPropertyName = $True,
+            ValueFromPipeline = $true,
+            ParameterSetName = 'ComputerName')]
+        [Alias('Host')]
+        [String[]]
+        $ComputerName,
 
         # Name of the record. This tends to be the FQDN requested.
         [Parameter(Mandatory =$false)]
@@ -104,12 +114,6 @@ function Get-CimDnsCache {
             '3' = 'Additional'
         }
 
-        # If no CIMSession is provided we create one for localhost.
-        if ($null -eq $CimSession -or $CimSession.Count -eq 0) {
-            $sessop = New-CimSessionOption -Protocol Dcom
-            $CimSession += New-CimSession -ComputerName $Env:Computername -SessionOption $sessop
-        }
-
          # Build WQL Query
          $PassedParams = $PSBoundParameters.Keys
          $filter = @()
@@ -167,13 +171,42 @@ function Get-CimDnsCache {
         } else {
             $Wql = "SELECT * FROM MSFT_DNSClientCache WHERE $($filterLogic) $($filter -join " AND " )"
         }
-        Write-Verbose -Message "Using WQL - $($Wql)"
-        
+
+        $CleanSession = $false
     }
     
     process {
 
-        Get-CimInstance -Namespace root/StandardCimv2 -Query $Wql -CimSession $CimSession | ForEach-Object {
+        $CimParamters = @{
+            'Namespace' = 'root/StandardCimv2'
+            'Query'     = $Wql
+        }
+
+        switch ($pscmdlet.ParameterSetName) {
+            'Local' { 
+                # DCOM to ensure propper connection to local host since WinRM is not garateed.
+                $sessop = New-CimSessionOption -Protocol Dcom
+                $LocalSession = New-CimSession -ComputerName $Env:Computername -SessionOption $sessop
+                $CimSession += $LocalSession
+
+                # Clean session after execution. 
+                $CleanSession = $true
+
+                $CimParamters.Add('CimSession', $CimSession)
+            }
+
+            'ComputerName' {
+                $CimParamters.Add('ComputerName', $ComputerName)
+            }
+
+            'CimInstance' {
+                $CimParamters.Add('CimSession', $CimSession)
+            }
+
+            Default {}
+        }
+
+        Get-CimInstance @CimParamters | ForEach-Object {
             $objprops = [ordered]@{}
             $objprops.add('Name',$_.name)
             $objprops.add('Entry',$_.Entry)
@@ -191,6 +224,8 @@ function Get-CimDnsCache {
     }
     
     end {
-        
+        if ($CleanSession) {
+                Remove-CimSession -CimSession $LocalSession
+        }
     }
 }

@@ -107,10 +107,20 @@ function Get-CimProcess {
 
         # CIMSession to perform query against
         [Parameter(ValueFromPipelineByPropertyName = $True,
-            ValueFromPipeline = $true)]
+            ValueFromPipeline = $true,
+            ParameterSetName = 'CimInstance')]
         [Alias('Session')]
         [Microsoft.Management.Infrastructure.CimSession[]]
         $CimSession,
+
+        # Specifies the computer on which you want to run the CIM operation. You can specify a fully qualified
+        # domain name (FQDN) a NetBIOS name, or an IP address.
+        [Parameter(ValueFromPipelineByPropertyName = $True,
+            ValueFromPipeline = $true,
+            ParameterSetName = 'ComputerName')]
+        [Alias('Host')]
+        [String[]]
+        $ComputerName,
 
         # Process properties to get.
         [Parameter(Mandatory = $false)]
@@ -267,11 +277,37 @@ function Get-CimProcess {
         } else {
             $Wql = "SELECT $( $Property -join ',' ) FROM Win32_Process WHERE $($filterLogic) $($filter -join " AND " )"
         }
-        Write-Verbose -Message "Using WQL query - $($Wql)"
     }
     
     process {
-        Get-CimInstance -Query $Wql -CimSession $CimSession | ForEach-Object {
+        $CimParamters = @{
+            'Query'     = $Wql
+        }
+
+        switch ($pscmdlet.ParameterSetName) {
+            'Local' { 
+                # DCOM to ensure propper connection to local host since WinRM is not garateed.
+                $sessop = New-CimSessionOption -Protocol Dcom
+                $LocalSession = New-CimSession -ComputerName $Env:Computername -SessionOption $sessop
+                $CimSession += $LocalSession
+
+                # Clean session after execution. 
+                $CleanSession = $true
+
+                $CimParamters.Add('CimSession', $CimSession)
+            }
+
+            'ComputerName' {
+                $CimParamters.Add('ComputerName', $ComputerName)
+            }
+
+            'CimInstance' {
+                $CimParamters.Add('CimSession', $CimSession)
+            }
+
+            Default {}
+        }
+        Get-CimInstance @CimParamters | ForEach-Object {
             $objectProps = [ordered]@{}
             foreach($p in $Property) {
                 $objectProps.Add($p, $_."$($p)")
@@ -294,6 +330,8 @@ function Get-CimProcess {
     }
     
     end {
-        
+        if ($CleanSession) {
+            Remove-CimSession -CimSession $LocalSession
+    }
     }
 }
