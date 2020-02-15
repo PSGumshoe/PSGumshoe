@@ -56,7 +56,7 @@ function Get-CimDnsCache {
 
         # Type of record cached.
         [Parameter(Mandatory = $false)]
-        [ValidateSet('A', 'NS', 'CNAME', 'SOA', 'PTR', 'MX', 'AAAA', 'SRV')]
+        [ValidateSet('A', 'NS', 'CNAME', 'SOA', 'PTR', 'MX', 'TXT', 'AAAA', 'SRV')]
         [string[]]
         $Type,
 
@@ -80,7 +80,8 @@ function Get-CimDnsCache {
             'CNAME' = 5 
             'SOA' = 6 
             'PTR' = 12 
-            'MX' = 15 
+            'MX' = 15
+            'TXT' = 16 
             'AAAA' = 28 
             'SRV' = 33
         }
@@ -92,6 +93,7 @@ function Get-CimDnsCache {
             '6' = 'SOA'
             '12' = 'PTR' 
             '15' = 'MX'
+            '16' = 'TXT' 
             '28' = 'AAAA' 
             '33' = 'SRV'
         }
