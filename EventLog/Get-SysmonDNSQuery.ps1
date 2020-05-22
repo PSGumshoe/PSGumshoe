@@ -1,32 +1,18 @@
+
 function Get-SysmonDNSQuery {
     <#
     .SYNOPSIS
-        Get Sysmon Access Procces EventLog Events (EventId 22).
+        Get Sysmon DNS Query events (EventId 22).
     .DESCRIPTION
-        Get Sysmon DNS Query events either locally or remotely from a specified location.
-        These events have an EventID of 10 and are for tracking DNS queries performed by processes.
+        Long description
     .EXAMPLE
-        PS C:\> Get-SysmonDNSQuery | Group-Object -Property query | Select-Object -Property count,name
-        Get a list of processes and count of DNS queries logged.
-    .EXAMPLE
-        PS C:\> Get-SysmonDNSQuery | Group-Object -Property query | Select-Object -Property count,name
-        Get a list of unique queries logged and a count for each.
-    .EXAMPLE
-        PS C:\> Get-SysmonDNSQuery -QueryStatus 0 -QueryName wpad
-        Get a list of successful WPAD resolutions.
-    .EXAMPLE
-        PS C:\> Get-SysmonDNSQuery -QueryStatus 9003 
-        Get a list of queries for where the DNS Name does not exist.
-    .EXAMPLE
-        PS C:\> Get-SysmonDNSQuery -QueryStatus 9501 
-        Get a list of queries for where no record was found.
+        PS C:\> <example usage>
+        Explanation of what the example does
     .INPUTS
         System.IO.FileInfo
+        System.String
     .OUTPUTS
-    Sysmon.EventRecord.DNSQuery
-    .NOTES
-        The number of events for this type may be a high one if there is no proper filtering in place for collection. 
-        DNS Status List https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--9000-11999-
+        Sysmon.EventRecord.DNSQuery
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -36,41 +22,35 @@ function Get-SysmonDNSQuery {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
-        # The PID of the process that is performing the query.
-        [Parameter(Mandatory = $false,
-                   ValueFromPipelineByPropertyName = $true)]
-        [int[]]
-        $ProcessId,
-
-        # The unique Process GUID of the process that is performing the query.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessGuid,
 
-        # Rule Name for filter that generated the event.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
-        $RuleName,
+        $ProcessId,
 
-        # FQDN that was queried.
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $Image,
+
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $QueryName,
 
-        # Status of the query perfomed.
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [int]
+        $QueryStatus,
+
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
-        $QueryStatus,
-
-        # Image of the process that perforemd the query.
-        [Parameter(Mandatory = $false,
-        ValueFromPipelineByPropertyName = $true)]
-        [string[]]
-        $Image,
+        $QueryResults,
 
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,
@@ -122,7 +102,12 @@ function Get-SysmonDNSQuery {
         # Changes the default logic for matching fields from 'and' to 'or'.
         [Parameter(Mandatory = $false)]
         [switch]
-        $ChangeLogic
+        $ChangeLogic,
+
+        # Changes the query action from inclusion to exclusion when fields are matched.
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $Suppress
     )
 
     begin {}

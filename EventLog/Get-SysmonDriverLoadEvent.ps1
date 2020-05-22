@@ -1,34 +1,20 @@
 function Get-SysmonDriverLoadEvent {
     <#
     .SYNOPSIS
-        Get Sysmon Driver Load events (EventId 6).
+        Get Sysmon DNS Query events (EventId 6).
     .DESCRIPTION
         The driver loaded events provides information about a driver being loaded on the system. 
         The configured hashes are provided as well as signature information. The signature is 
         created asynchronously for performance reasons and indicates if the file was removed 
         after loading.
     .EXAMPLE
-        PS C:\> Get-SysmonDriverLoadEvent -Path ..\Desktop\sysmondriver.evtx  -SignatureStatus Expired
-
-        EventId         : 6
-        EventType       : DriverLoad
-        Computer        : DESKTOP-4TVLVMD
-        EventRecordID   : 10562189
-        RuleName        :
-        UtcTime         : 2019-07-27 02:27:51.075
-        ImageLoaded     : C:\mimi\x64\mimidrv.sys
-        Hashes          : SHA1=02A9314109E47C5CE52FA553EA57070BF0F8186A
-        Signed          : false
-        Signature       :
-        SignatureStatus : Expired
-
-        Find drivers loaded with expired signature.
+        PS C:\> <example usage>
+        Explanation of what the example does
     .INPUTS
         System.IO.FileInfo
+        System.String
     .OUTPUTS
         Sysmon.EventRecord.DriverLoad
-    .NOTES
-        https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=90006
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -54,7 +40,7 @@ function Get-SysmonDriverLoadEvent {
         # If the signature on the driver is valid or not
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('Valid','Expired')]
+        [ValidateSet('Valid','Invalid')]
         [string]
         $SignatureStatus,
 
@@ -69,11 +55,6 @@ function Get-SysmonDriverLoadEvent {
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Hashes,
-
-        # Rule Name for filter that generated the event.
-        [Parameter(Mandatory = $false)]
-        [string[]]
-        $RuleName,
 
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,
