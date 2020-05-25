@@ -10,6 +10,7 @@ function Get-SysmonCreateRemoteThreadEvent {
         Find all events where the API CreateRemoteThread was used and the process image was not WmiPrvSE.exe.
     .INPUTS
         System.IO.FileInfo
+        System.String
     .OUTPUTS
         Sysmon.EventRecord.CreateRemoteThread
     .NOTES

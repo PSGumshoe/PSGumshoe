@@ -12,6 +12,7 @@ function Get-SysmonConfigChange {
         Get events with a empty configuration file hash field. This may be due to a configuration being modified or cleared via the command line.
     .INPUTS
         System.IO.FileInfo
+        System.String
     .OUTPUTS
         Sysmon.EventRecord.ConfigChange
     #>

@@ -8,8 +8,22 @@ function Get-SysmonDriverLoadEvent {
         created asynchronously for performance reasons and indicates if the file was removed 
         after loading.
     .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        PS C:\> Get-SysmonDriverLoadEvent -SignatureStatus Expired
+
+
+        EventId         : 6
+        EventType       : DriverLoad
+        Computer        : DESKTOP-4TVLVMD
+        EventRecordID   : 12173822
+        RuleName        : -
+        UtcTime         : 2020-05-25 18:52:41.327
+        ImageLoaded     : C:\Users\carlos\Desktop\mimikatz\x64\mimidrv.sys
+        Hashes          : MD5=26AEDC10D4215BA997495D3A68355F4A
+        Signed          : false
+        Signature       : -
+        SignatureStatus : Expired
+
+        Search for expired driver. Example of the Mimikatz driver loading.
     .INPUTS
         System.IO.FileInfo
         System.String
@@ -40,7 +54,7 @@ function Get-SysmonDriverLoadEvent {
         # If the signature on the driver is valid or not
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('Valid','Invalid')]
+        [ValidateSet('Valid','Invalid', 'Expired')]
         [string]
         $SignatureStatus,
 

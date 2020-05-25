@@ -59,6 +59,7 @@ function Get-SysmonCreateNamedPipe {
         Find events for rule name "PSExec Execution"
     .INPUTS
         System.IO.FileInfo
+        System.String
     .OUTPUTS
         Sysmon.EventRecord.PipeCreated
     #>

@@ -9,6 +9,7 @@ function Get-SysmonConnectNamedPipe {
         Query remote Windows Event Collector server for Named Pipes connection events.
     .INPUTS
         System.IO.FileInfo
+        System.String
     .OUTPUTS
         Sysmon.EventRecord.PipeConnected
     #>
