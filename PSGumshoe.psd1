@@ -41,7 +41,7 @@ FunctionsToExport = @(
     'Get-EventPsIPC',
     'Get-EventPsScriptBlock',
     'Get-WinEventBaseXPathFilter',
-    'Get-SysmonAccessProcess',
+    'Get-SysmonProcessAccess',
     'Get-SysmonConfigChange',
     'Get-SysmonConnectNamedPipe',
     'Get-SysmonCreateNamedPipe',

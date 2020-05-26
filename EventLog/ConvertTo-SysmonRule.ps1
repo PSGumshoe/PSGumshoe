@@ -48,7 +48,7 @@ function ConvertTo-SysmonRule {
             } elseif ($propCount -gt 1) {
                 $RuleGroup = "<Rule groupRelation=`"and`">`n"
                 $event.PSObject.Properties | ForEach-Object {
-                    $RuleGroup += "    <$($_.name) condition='$($Condition)'>$($_.value)</$($_.name)>`n"
+                    $RuleGroup += "  <$($_.name) condition='$($Condition)'>$($_.value)</$($_.name)>`n"
                 }
                 $RuleGroup += "</Rule>"
                 $RuleGroup

@@ -38,7 +38,7 @@
 . $PSScriptRoot\EventLog\Get-EventPsScriptBlock.ps1
 . $PSScriptRoot\EventLog\Get-WinEventBaseXPathFilter.ps1
 . $PSScriptRoot\EventLog\ConvertFrom-SysmonEventLogRecord.ps1
-. $PSScriptRoot\EventLog\Get-SysmonAccessProcess.ps1
+. $PSScriptRoot\EventLog\Get-SysmonProcessAccess.ps1
 . $PSScriptRoot\EventLog\Get-SysmonConfigChange.ps1
 . $PSScriptRoot\EventLog\Get-SysmonConnectNamedPipe.ps1
 . $PSScriptRoot\EventLog\Get-SysmonCreateNamedPipe.ps1
