@@ -81,7 +81,7 @@
 . $PSScriptRoot\EventLog\Get-SysmonRuleHash.ps1
 . $PSScriptRoot\EventLog\Get-EventProcessCreate.ps1
 . $PSScriptRoot\EventLog\ConvertTo-SysmonRule.ps1
-
+. $PSScriptRoot\EventLog\Clear-WinEvent.ps1
 
 # CIM Collection Functions
 #-------------------------

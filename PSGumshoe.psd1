@@ -78,6 +78,7 @@ FunctionsToExport = @(
     'Get-SysmonRuleHash',
     'ConvertTo-SysmonRule',
     'Get-EventProcessCreate',
+    'Clear-WinEvent',
     # CIM Functions
     'Get-CimLogonSession',
     'Get-CimProcessLogonSession',
