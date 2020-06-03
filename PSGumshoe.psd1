@@ -1,5 +1,6 @@
 @{
 
+Author = "Carlos Perez (carlos_perez@darkoperator.com)"
 # Script module or binary module file associated with this manifest.
 RootModule = 'PSGumshoe.psm1'
 
