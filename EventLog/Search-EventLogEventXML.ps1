@@ -153,20 +153,20 @@ function Search-EventLogEventXML {
    process {
 
        # Perform query and turn results in to a more easy to parse object.
-       switch ($PSCmdlet.ParameterSetName) {
-           'Remote' {
+       switch ($Params) {
+           'ComputerName' {
                $ComputerName | ForEach-Object {
                    if ($null -eq $Credential) {
                        if ($MaxEvents -gt 0) {
-                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
+                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-EventEventXMLRecord
                        } else {
-                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
+                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-EventEventXMLRecord
                        }
                    } else {
                        if ($MaxEvents -gt 0) {
-                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
+                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-EventEventXMLRecord
                        } else {
-                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
+                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-EventEventXMLRecord
                        }
                    }
                }

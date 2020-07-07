@@ -28,11 +28,66 @@ function Get-EventProcessCreate {
         [string]
         $LogName = 'Security',
 
-        # User under which context the job ran.
+        # SID of account that requested the “create process” operation. 
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
-        $User,
+        $SubjectUserSid,
+
+        # The name of the account that requested the “create process” operation.
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $SubjectUserName,
+
+        # Subject’s domain or computer name. Formats vary, and include the following:
+        # * Domain NETBIOS name example: CONTOSO
+        # * Lowercase full domain name: contoso.local
+        # * Uppercase full domain name: CONTOSO.LOCAL
+        # * For some well-known security principals, such as LOCAL SERVICE or ANONYMOUS LOGON, the value of this field is “NT AUTHORITY”.
+        # * For local user accounts, this field will contain the name of the computer or device that this account belongs to, for example: “Win81”.
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $SubjectDomainName,
+
+        # Hexadecimal value that can help you correlate this event with recent events that might contain the same Logon ID, for example, “4624: An account was successfully logged on.”
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $SubjectLogonId,
+
+        # SID of target account. 
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $TargetUserSid,
+
+        # The name of the target account.
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $TargetUserName,
+
+        # Target account’s domain or computer name. 
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $TargetDomainName,
+
+        # Hexadecimal value that can help you correlate this event with recent events that might contain the same Logon ID
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $TargetLogonId,
+
+        # SID of integrity label which was assigned to the new process.
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [ValidateSet("Untrusted", "Low_Integrity", "Medium_Integrity", "Medium_High_Integrity",
+                     "High_Integrity", "System_Integrity", "Protected_Process")]
+        [string[]]
+        $MandatoryLabel,
 
         # Process to search
         [Parameter(Mandatory = $false,
@@ -69,6 +124,8 @@ function Get-EventProcessCreate {
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $TokenElevationType,
+
+
 
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,
@@ -130,6 +187,26 @@ function Get-EventProcessCreate {
 
     begin {
         $Params = $MyInvocation.BoundParameters
+
+        if ($MandatoryLabel.Count -gt 0) {
+            $MandatoryLabels = @()
+            foreach($ltype in $MandatoryLabel) {
+                switch ($ltype)
+                {
+
+                    "Untrusted" {$MandatoryLabels + 'S-1-16-0'}
+                    "Low_Integrity" {$MandatoryLabels + 'S-1-16-4096'}
+                    "Medium_Integrity" {$MandatoryLabels + 'S-1-16-8192'}
+                    "Medium_High_Integrity" {$MandatoryLabels + 'S-1-16-8448'}
+                    "High_Integrity" {$MandatoryLabels + 'S-1-16-12288'}
+                    "System_Integrity" {$MandatoryLabels + 'S-1-16-16384'}
+                    "Protected_Process" {$MandatoryLabels + 'S-1-16-20480'}
+                    Default {}
+                }
+            }
+            $Params.Remove("MandatoryLabel")| Out-Null
+            $Params.Add("MandatoryLabel",$MandatoryLabels) | Out-Null
+        }
         
     }
 

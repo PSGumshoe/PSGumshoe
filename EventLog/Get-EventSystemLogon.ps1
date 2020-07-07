@@ -70,13 +70,29 @@ function Get-EventSystemLogon {
         $UserSID,
 
         # Hexadecimal value that can help you correlate this event with recent events that might contain the same Logon ID, 
-        # for example, �4672(S): Special privileges assigned to new logon.�
+        # for example, 4672(S): Special privileges assigned to new logon.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
-        $LogonId,
+        $TargetLinkedLogonId,
 
-        # Subject�s domain or computer name. Formats vary, and include the following:
+        # Hexadecimal value that can help you correlate this event with recent events that might contain the same Logon ID, 
+        # for example, 4672(S): Special privileges assigned to new logon.
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $SubjectLogonId,
+
+        # GUID that can help you correlate this event with another event that can contain the same Logon GUID for Example 4769
+        # A Kerberos service ticket was requested event on a domain controller. It also can be used for correlation between a 
+        # 4624 event and several other events (on the same computer) that can contain the same Logon GUID, Example of this is 
+        # “4648: A logon was attempted using explicit credentials” and “4964: Special groups have been assigned to a new logon.”
+        [Parameter(Mandatory = $false,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string[]]
+        $LogonGuid,
+
+        # Subject's domain or computer name. Formats vary, and include the following:
         #
         # * Domain NETBIOS name example: CONTOSO
         # * Lowercase full domain name: contoso.local
@@ -147,6 +163,21 @@ function Get-EventSystemLogon {
     )
 
     begin {
+
+        $boolValues = @{
+            '%%1842' = 'Yes'
+            '%%1843' = 'No'
+        }
+
+
+        # Impersonation levels.
+        $ImpLevels = @{
+            '%%1831' = 'Anonymous'
+            '%%1832' = 'Identify'
+            '%%1833' = 'Impersonate'
+            '%%1834' = 'Delegate'
+        }
+
         $Params = $MyInvocation.BoundParameters
         if ($EventLogonType.Count -gt 0) {
             $LogonType = @()
@@ -183,15 +214,15 @@ function Get-EventSystemLogon {
             $Params.Remove("UserDomain") | Out-Null
             $Params.Add('TargetDomainName', $UserDomain) | Out-Null
         }
-
-        if ($Params.Keys -contains "LogonId") {
-            $Params.Remove("LogonId") | Out-Null
-            $Params.Add('SubjectLogonId', $LogonId) | Out-Null
-        }
     }
 
     process {
-        Search-EventLogEventData -EventId 4624 -ParamHash $Params -Provider "Microsoft-Windows-Security-Auditing" -RecordType "SuccessFulLogon"
+        Search-EventLogEventData -EventId 4624 -ParamHash $Params -Provider "Microsoft-Windows-Security-Auditing" -RecordType "SuccessFulLogon" | ForEach-Object {
+            $_.VirtualAccount = $boolValues[$_.VirtualAccount]
+            $_.ElevatedToken = $boolValues[$_.ElevatedToken]
+            $_.ImpersonationLevel = $ImpLevels[$_.ImpersonationLevel]
+            $_
+        }
 
     }
 

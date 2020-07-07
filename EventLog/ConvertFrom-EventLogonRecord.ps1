@@ -34,7 +34,6 @@ function ConvertFrom-EventLogonRecord {
             $ProcInfo[$_.name] = $_.'#text'
         }
         $Obj = New-Object psobject -Property $ProcInfo
-        $Obj.pstypenames[0] = 'Event.SuccessfulLogon'
         $Obj
     }
 

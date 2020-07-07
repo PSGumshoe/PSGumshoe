@@ -11,13 +11,13 @@ function Get-EventTerminalLogon {
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
-        $IpAddress,
+        $Address,
 
         # The name of the account for which logon was performed
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
-        $UserName,
+        $User,
 
         # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
         [Parameter(Mandatory=$true,
@@ -81,14 +81,14 @@ function Get-EventTerminalLogon {
         $Params = $MyInvocation.BoundParameters
         
 
-        if ($Params.Keys -contains "UserName") {
-            $Params.Remove("UserName") | Out-Null
-            $Params.Add('User', $UserName) | Out-Null
+        if ($Params.Keys -contains "User") {
+            $Params.Remove("User") | Out-Null
+            $Params.Add('User', $User) | Out-Null
         }
 
-        if ($Params.Keys -contains "IpAddress") {
-            $Params.Remove("IpAddress") | Out-Null
-            $Params.Add('Address', $IpAddress) | Out-Null
+        if ($Params.Keys -contains "Address") {
+            $Params.Remove("Address") | Out-Null
+            $Params.Add('Address', $Address) | Out-Null
         }
     }
 

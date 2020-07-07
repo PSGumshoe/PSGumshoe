@@ -1,4 +1,4 @@
-function Get-PsgProcessLogonSession {
+function Get-CimProcessLogonSession {
     <#
     .SYNOPSIS
         Query the CIM database for the logon session and account infor for a specific process.
@@ -66,7 +66,7 @@ function Get-PsgProcessLogonSession {
                 $objProps.Add('StartTime', $_.StartTime)
                 $objProps.Add('AuthenticationPackage', $_.AuthenticationPackage)
                 $objProps.Add('LogonId', $_.LogonId)
-                $objProps.Add('LogonIdHex', "0x$("{0:x}" -f $_.LogonId)")
+                $objProps.Add('LogonIdHex', "0x$("{0:x}" -f [int]$_.LogonId)")
                 $objProps.Add('LogonType', $_.LogonType)
 
                 # Get the associated win32_account info.

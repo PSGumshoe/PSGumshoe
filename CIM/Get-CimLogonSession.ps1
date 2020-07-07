@@ -1,4 +1,4 @@
-function Get-PsgLogonSession {
+function Get-CimLogonSession {
     <#
     .SYNOPSIS
         Query the CIM Object database for a list of Logon Sessions and account related to session on a target host.

@@ -153,9 +153,10 @@ function Search-EventLogEventData {
    process {
 
        # Perform query and turn results in to a more easy to parse object.
-       switch ($PSCmdlet.ParameterSetName) {
-           'Remote' {
+       switch ($Params) {
+           'ComputerName' {
                $ComputerName | ForEach-Object {
+                   Write-Verbose -Message "Querying $($_)"
                    if ($null -eq $Credential) {
                        if ($MaxEvents -gt 0) {
                            Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
