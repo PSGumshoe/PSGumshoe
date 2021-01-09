@@ -93,6 +93,7 @@
 . $PSScriptRoot\CIM\Get-CimProcess.ps1
 . $PSScriptRoot\CIM\Get-CimComputerInfo.ps1
 . $PSScriptRoot\CIM\Get-CimDNSCache.ps1
+. $PSScriptRoot\CIM\Get-CimNetLogon.ps1
 
 
 #region PSReflect
