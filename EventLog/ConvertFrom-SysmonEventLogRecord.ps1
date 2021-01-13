@@ -46,6 +46,8 @@ function ConvertFrom-SysmonEventLogRecord {
             '21' = 'WmiBinding'
             '22' = 'DNSQuery'
             '23' = 'FileDelete'
+            '24' = 'ClipboardChange '
+            '25' = 'ProcessTamper'
             '255' = 'Error'
         }
     }

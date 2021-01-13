@@ -1,14 +1,29 @@
 
-function Get-SysmonServiceStateChange {
+function Get-SysmonProcessTampering {
     <#
     .SYNOPSIS
-        Get Sysmon Service State Change events (Event Id 4) from a local or remote host.
+        Get Sysmon Process Tampering events (Event Id 25) from a local or remote host.
     .DESCRIPTION
-        Get Sysmon Service State Change events from a local or remote host. Events can be filtered by fields.
+        Get Sysmon Process Tampering events from a local or remote host. Events can be filtered by fields.
+    .EXAMPLE
+        PS C:\> Get-SysmonProcessTampering | select image -Unique
+
+        Image
+        -----
+        <unknown process>
+        C:\Program Files\Git\cmd\git.exe
+        C:\Program Files\Git\mingw64\bin\git.exe
+        C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
+        C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
+        C:\Users\cperez\AppData\Local\Programs\Microsoft VS Code\Code.exe
+        C:\Windows\System32\conhost.exe
+
+        Get unique images for use in exclusion filter. 
+
     .INPUTS
         System.IO.FileInfo
     .OUTPUTS
-        Sysmon.EventRecord.ServiceStateChange
+        Sysmon.EventRecord.ProcessTamper
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -18,32 +33,23 @@ function Get-SysmonServiceStateChange {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
+        # Process Id
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
-        [ValidateSet('Stopped', 'Started')]
-        $State,
+        $ProcessId,
 
+        # Process Guid
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
-        $Version,
+        $ProcessGuid,
 
+        # Image of process full path.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
-        $SchemaVersion,
-
-        # Specifies the path to the event log files that this cmdlet get events from. Enter the paths to the log files in a comma-separated list, or use wildcard characters to create file path patterns. Function supports files with the .evtx file name extension. You can include events from different files and file types in the same command.
-        [Parameter(Mandatory=$true,
-                   Position=0,
-                   ParameterSetName="file",
-                   ValueFromPipelineByPropertyName=$true)]
-        [Alias("FullName")]
-        [ValidateNotNullOrEmpty()]
-        [SupportsWildcards()]
-        [string[]]
-        $Path,
+        $Image,
 
 
         # Gets events from the event logs on the specified computer. Type the NetBIOS name, an Internet Protocol (IP) address, or the fully qualified domain name of the computer.
@@ -95,7 +101,7 @@ function Get-SysmonServiceStateChange {
     begin {}
 
     process {
-        Search-SysmonEvent -EventId 4 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 25 -ParamHash $MyInvocation.BoundParameters
 
     }
 

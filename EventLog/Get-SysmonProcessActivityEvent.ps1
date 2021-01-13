@@ -27,7 +27,8 @@ function Get-SysmonProcessActivityEvent {
         # Type of Activity to get.
         [Parameter(Mandatory = $false)]
         [ValidateSet('Create', 'Terminate', 'FileTime', 'NetworkConnect','ImageLoad','RawAccess', 'FileCreate', 'RegistryKey',
-                     'RegistryVAlue','RegistryName', 'FileStream', 'NamedPipeCreate', 'NamedPipeConnect', 'CreateRemoteThread', 'AccessProcess', 'All')]
+                     'RegistryVAlue','RegistryName', 'FileStream', 'NamedPipeCreate', 'NamedPipeConnect', 'CreateRemoteThread', 
+                     'AccessProcess', 'ProcessTamper', 'All')]
         [String[]]
         $ActivityType = 'All',
 
@@ -105,11 +106,12 @@ function Get-SysmonProcessActivityEvent {
                 'NamedPipeConnect' {$TypeIds += 18 }
                 'CreateRemoteThread' {$TypeIds += 8}
                 'AccessProcess' {$TypeIds += 10}
+                'ProcessTamper' {$TypeIds += 25}
                 'All' {
-                    $TypeIds = 1,2,3,5,7,9,11,12,13,14,15,17,18
+                    $TypeIds = 1,2,3,5,7,9,11,12,13,14,15,17,18,25
                     break
                 }
-                Default {$TypeIds = 1,2,3,5,7,9,11,12,13,14,15,17,18}
+                Default {$TypeIds = 1,2,3,5,7,9,11,12,13,14,15,17,18,25}
             }
         }
         write-verbose -Message "Events: $($typeIds)"

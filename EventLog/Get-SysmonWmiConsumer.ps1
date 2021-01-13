@@ -1,18 +1,13 @@
 function Get-SysmonWmiConsumer {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon WMI Consumer events (Event Id 20) from a local or remote host.
     .DESCRIPTION
-        Long description
-    .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        Get Sysmon WMI Consumer events from a local or remote host. Events can be filtered by fields.
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
-    .NOTES
-        General notes
+        Sysmon.EventRecord.WmiConsumer
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (

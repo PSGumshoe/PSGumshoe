@@ -1,18 +1,13 @@
 function Get-SysmonRegistryRename {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon Registry Rename events (Event Id 14) from a local or remote host.
     .DESCRIPTION
-        Long description
-    .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        Get Sysmon Registry Rename events from a local or remote host. Events can be filtered by fields.
     .INPUTS
-        Inputs (if any)
+        System.IO.FileInfo
     .OUTPUTS
-        Output (if any)
-    .NOTES
-        General notes
+        Sysmon.EventRecord.RegistryRename
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (

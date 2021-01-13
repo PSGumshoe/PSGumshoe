@@ -2,9 +2,9 @@
 function Get-SysmonProcessCreateEvent {
     <#
     .SYNOPSIS
-        Short description
+        Get Sysmon Process Create events (Event Id 1) from a local or remote host.
     .DESCRIPTION
-        Long description
+        Get Sysmon Process Create events from a local or remote host. Events can be filtered by fields.
     .EXAMPLE
         PS C:\> $OfficeImages = @('C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE',
         'C:\Program Files\Microsoft Office\root\Office16\POWERPNT.EXE',

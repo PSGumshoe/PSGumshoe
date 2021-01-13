@@ -51,6 +51,7 @@
 . $PSScriptRoot\EventLog\Get-SysmonImageLoadEvent.ps1
 . $PSScriptRoot\EventLog\Get-SysmonNetworkConnect.ps1
 . $PSScriptRoot\EventLog\Get-SysmonProcessCreateEvent.ps1
+. $PSScriptRoot\EventLog\Get-SysmonProcessTampering.ps1
 . $PSScriptRoot\EventLog\Get-SysmonProcessTerminateEvent.ps1
 . $PSScriptRoot\EventLog\Get-SysmonRawAccessRead.ps1
 . $PSScriptRoot\EventLog\Get-SysmonRegistryKey.ps1
