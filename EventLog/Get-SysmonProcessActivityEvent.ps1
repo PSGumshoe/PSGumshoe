@@ -28,7 +28,7 @@ function Get-SysmonProcessActivityEvent {
         [Parameter(Mandatory = $false)]
         [ValidateSet('Create', 'Terminate', 'FileTime', 'NetworkConnect','ImageLoad','RawAccess', 'FileCreate', 'RegistryKey',
                      'RegistryVAlue','RegistryName', 'FileStream', 'NamedPipeCreate', 'NamedPipeConnect', 'CreateRemoteThread', 
-                     'AccessProcess', 'ProcessTamper', 'DnsQuary', 'FileDelete', 'ClipboardChange', 'All')]
+                     'AccessProcess', 'ProcessTamper', 'DnsQuery', 'FileDelete', 'ClipboardChange', 'All')]
         [String[]]
         $ActivityType = 'All',
 
