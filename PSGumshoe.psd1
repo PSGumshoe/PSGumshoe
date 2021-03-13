@@ -5,7 +5,7 @@ Author = "Carlos Perez (carlos_perez@darkoperator.com)"
 RootModule = 'PSGumshoe.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.6'
+ModuleVersion = '1.7'
 
 # ID used to uniquely identify this module
 GUID = '6f0aaa95-8bc2-43ef-b06c-440ba94a7e5d'
@@ -66,6 +66,8 @@ FunctionsToExport = @(
     'Get-SysmonWmiFilter',
     'Get-SysmonDNSQuery',
     'Get-SysmonProcessActivityEvent',
+    'Get-SysmonClipboardChange',
+    'Get-SysmonError',
     'Get-EventSystemLogon',
     'Get-EventSystemLogoff',
     'Get-EventTerminalLogon',
