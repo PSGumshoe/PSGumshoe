@@ -218,8 +218,8 @@ function Get-EventSystemLogon {
 
     process {
         Search-EventLogEventData -EventId 4624 -ParamHash $Params -Provider "Microsoft-Windows-Security-Auditing" -RecordType "SuccessFulLogon" | ForEach-Object {
-            $_.VirtualAccount = $boolValues[$_.VirtualAccount]
-            $_.ElevatedToken = $boolValues[$_.ElevatedToken]
+            #$_.VirtualAccount = $boolValues[$_.VirtualAccount]
+            #$_.ElevatedToken = $boolValues[$_.ElevatedToken]
             $_.ImpersonationLevel = $ImpLevels[$_.ImpersonationLevel]
             $_
         }
