@@ -1,4 +1,4 @@
-function Get-EventPsScriptBlock {
+function Get-EventPsScriptCommandExec {
     <#
     .Synopsis
     Short description
@@ -81,15 +81,33 @@ function Get-EventPsScriptBlock {
         # ScriptBlock ID GUID that identifies the specific scriptblock on the system. This value is unique per host. 
         [Parameter(Mandatory = $false)]
         [string]
-        $ScriptBlockId
+        $ScriptBlockId,
+
+        # RunSpace ID GUID, unique identifier of the PowerShell runspace that executed the script block. 
+        [Parameter(Mandatory = $false)]
+        [string]
+        $RunSpaceId,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('All','Start','End')]
+        [string]
+        $ExecType = 'All'
     )
 
     Begin {
         $Params = $MyInvocation.BoundParameters
+        $Params.Remove("ExecType") | Out-Null
+        
     }
     Process {
+        [System.Collections.ArrayList]$eventIds = @(4105,4106)
+        switch ($ExecType) {
+            'Start' { $eventIds.Add(4105) | Out-Null}
+            'End' { $eventIds.Add(4106) | Out-Null}
+            'All' { }
+        }
 
-        Search-EventLogEventData -EventId 4104 -ParamHash $Params -Provider "Microsoft-Windows-PowerShell" -RecordType "PSScriptBlock" 
+        Search-EventLogEventData -EventId $eventIds -ParamHash $Params -Provider "Microsoft-Windows-PowerShell" -RecordType "PSScriptExec" 
 
     }
     End {}

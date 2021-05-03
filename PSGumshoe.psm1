@@ -35,6 +35,7 @@
 . $PSScriptRoot\EventLog\Get-EventPsEngineState.ps1
 . $PSScriptRoot\EventLog\Get-EventPsIPC.ps1
 . $PSScriptRoot\EventLog\Get-EventPsPipeline.ps1
+. $PSScriptRoot\EventLog\Get-EventPsScriptCommandExec.ps1
 . $PSScriptRoot\EventLog\Get-EventPsScriptBlock.ps1
 . $PSScriptRoot\EventLog\Get-WinEventBaseXPathFilter.ps1
 . $PSScriptRoot\EventLog\ConvertFrom-SysmonEventLogRecord.ps1

@@ -1,9 +1,9 @@
-function Get-SysmonFileDeleteDetectedEvent {
+function Get-SysmonFileDeleteEvent {
     <#
     .SYNOPSIS
-        Get Sysmon File Delete Detection and Archiving events (EventId 23).
+        Get Sysmon File Delete Detection events (EventId 23).
     .DESCRIPTION
-        File delete operations are logged when a file is deleted. This event is useful for monitoring when a piece of malware or an actor deleted files to cover their tracks. This event id will not store the files, please look at FileDelete events for that.
+        File delete operations are logged when a file is deleted. This event is useful for monitoring when a piece of malware or an actor deleted files to cover their tracks.
     .EXAMPLE
         PS C:\> Get-SysmonFileDeleteDetectedEvent -Image 'C:\Windows\System32\certutil.exe'
         Find events where certutil deleted a file on the machine.
@@ -117,7 +117,7 @@ function Get-SysmonFileDeleteDetectedEvent {
     begin {}
 
     process {
-        Search-SysmonEvent -EventId 23 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 26 -ParamHash $MyInvocation.BoundParameters
 
     }
 
