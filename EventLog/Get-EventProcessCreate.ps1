@@ -28,30 +28,30 @@ function Get-EventProcessCreate {
         [string]
         $LogName = 'Security',
 
-        # SID of account that requested the “create process” operation. 
+        # SID of account that requested the "create process" operation. 
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SubjectUserSid,
 
-        # The name of the account that requested the “create process” operation.
+        # The name of the account that requested the "create process" operation.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SubjectUserName,
 
-        # Subject’s domain or computer name. Formats vary, and include the following:
+        # Subjects domain or computer name. Formats vary, and include the following:
         # * Domain NETBIOS name example: CONTOSO
         # * Lowercase full domain name: contoso.local
         # * Uppercase full domain name: CONTOSO.LOCAL
-        # * For some well-known security principals, such as LOCAL SERVICE or ANONYMOUS LOGON, the value of this field is “NT AUTHORITY”.
-        # * For local user accounts, this field will contain the name of the computer or device that this account belongs to, for example: “Win81”.
+        # * For some well-known security principals, such as LOCAL SERVICE or ANONYMOUS LOGON, the value of this field is "NT AUTHORITY".
+        # * For local user accounts, this field will contain the name of the computer or device that this account belongs to, for example: "Win81".
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $SubjectDomainName,
 
-        # Hexadecimal value that can help you correlate this event with recent events that might contain the same Logon ID, for example, “4624: An account was successfully logged on.”
+        # Hexadecimal value that can help you correlate this event with recent events that might contain the same Logon ID, for example, "4624: An account was successfully logged on.""
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]

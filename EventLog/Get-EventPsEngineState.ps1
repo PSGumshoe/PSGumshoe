@@ -105,6 +105,8 @@ function Get-EventPsEngineState {
             $evtInfo['TimeCreated'] = [datetime]$evtXml.Event.System.TimeCreated.SystemTime
             $evtInfo['Computer'] = $evtXml.Event.System.Computer
             $evtInfo['Provider'] = $evtXml.Event.System.Provider.Name
+            $evtInfo['ProcessID'] = $evtXml.Event.System.Execution.ProcessID
+            $evtInfo['ThreadID'] = $evtXml.Event.System.Execution.ThreadID
             $evtData = $evtxml.Event.EventData.Data[2] -split "`n"
             foreach($line in $evtData) {
                 if ($line.trim() -ne '') {

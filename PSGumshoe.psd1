@@ -5,7 +5,7 @@ Author = "Carlos Perez (carlos_perez@darkoperator.com)"
 RootModule = 'PSGumshoe.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.7.3'
+ModuleVersion = '2.0.0'
 
 # ID used to uniquely identify this module
 GUID = '6f0aaa95-8bc2-43ef-b06c-440ba94a7e5d'
@@ -16,12 +16,12 @@ Description = 'PowerShell module for data collection, incident response, hunting
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
     # Volatile information functions
-    'Get-InjectedThread',
+    #'Get-InjectedThread',
     'Get-NamedPipe',
     'Measure-CharacterFrequency',
     'Measure-DamerauLevenshteinDistance',
     'Measure-VectorSimilarity',
-    'Stop-Thread',
+    #'Stop-Thread',
     # Directory Service functions
     'Get-DSForest',
     'Get-DSDirectoryEntry',
@@ -86,7 +86,12 @@ FunctionsToExport = @(
     'Get-EventProcessCreate',
     'Clear-WinEvent',
     'Export-WinEvent',
-    'Get-EventWmiQueryError'
+    'Get-EventWmiQueryError',
+    'Search-EventLogUserData'
+    'Get-EventWmiProviderStart',
+    'Get-EventWmiOperationFailure',
+    'Get-EventWmiTemporaryEvent',
+    'Get-EventWmiPermanentEvent'
     # CIM Functions
     'Get-CimLogonSession',
     'Get-CimProcessLogonSession',

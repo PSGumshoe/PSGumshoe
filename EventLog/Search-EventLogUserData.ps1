@@ -1,12 +1,9 @@
-function Search-EventLogEventData {
+function Search-EventLogUsertData {
     <#
     .SYNOPSIS
-        Internal funtion for searching events with a keyed flat Event Data structure.
+        Internal funtion for searching events with a keyed flat User Data structure.
     .DESCRIPTION
-        Internal funtion for searching events with a keyed flat Event Data structure.
-    .EXAMPLE
-        PS C:\> <example usage>
-        Explanation of what the example does
+        Internal funtion for searching events with a keyed flat User Data structure.
     .INPUTS
         Inputs (if any)
     .OUTPUTS
@@ -86,15 +83,31 @@ function Search-EventLogEventData {
                $FilterCount = 0
                foreach($val in $FieldValue) {
                     if ($FilterCount -gt 0) {
-                       $filter = $filter + " or *[EventData[Data[@Name='$($Param)']='$($val)']]"
+                        if ($SubElement) { 
+                            $filter = $filter + " or *[UserData/*/$($Param)='$($val)']"
+                        } else {
+                            $filter = $filter + " or *[UserData[Data[@Name='$($Param)']='$($val)']]"
+                        }
                     } else {
                         if ($Params -contains 'Suppress') {
-                            $filter = $filter + " (*[EventData[Data[@Name='$($Param)']='$($val)']]"
+                            if ($SubElement) {
+                                $filter = $filter + " (*[UserData/*/$($Param)='$($val)']"
+                            } else {
+                                $filter = $filter + " (*[UserData[Data[@Name='$($Param)']='$($val)']]"
+                            }
                         } else {
                             if ($filterBlockCount -gt 0) {
-                                $filter = $filter + " $( $logicOperator ) (*[EventData[Data[@Name='$($Param)']='$($val)']]"
+                                if ($SubElement) { 
+                                    $filter = $filter + " $( $logicOperator ) (*[UserData/*/$($Param)='$($val)']"
+                                } else {
+                                    $filter = $filter + " $( $logicOperator ) (*[UserData[Data[@Name='$($Param)']='$($val)']]"
+                                }
                             } else {
-                                $filter = $filter + " and (*[EventData[Data[@Name='$($Param)']='$($val)']]"
+                                if ($SubElement) { 
+                                    $filter = $filter + " and (*[UserData/*/$($Param)='$($val)']"
+                                } else {
+                                    $filter = $filter + " and (*[UserData[Data[@Name='$($Param)']='$($val)']]"
+                                }
                                 $filterBlockCount += 1
                             }
                         }
