@@ -94,6 +94,7 @@
 . $PSScriptRoot\EventLog\Search-EventLogUserData.ps1
 . $PSScriptRoot\EventLog\Get-EventWmiTemporaryEvent.ps1
 . $PSScriptRoot\EventLog\Get-EventWmiPermanentEvent.ps1
+. $PSScriptRoot\EventLog\Get-EventWmiObjectAccess.ps1
 
 # CIM Collection Functions
 #-------------------------

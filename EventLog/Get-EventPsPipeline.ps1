@@ -3,9 +3,7 @@ function Get-EventPsPipeline {
     .Synopsis
     Get all Windows PowerShell Pipeline Events (EventID 800)
     .DESCRIPTION
-    Get all Windows PowerShell Pipeline Events (EventID 800)
-    .EXAMPLE
-    Example of how to use this cmdlet
+    Get all Windows PowerShell Pipeline Events (EventID 800). This event is generated when module logging is enabled.
     .NOTES
     This function needs to be executed with administrator priviages on the host.
     #>
@@ -91,7 +89,7 @@ function Get-EventPsPipeline {
             $HashFilter.Add('ComputerName', $ComputerName)
         }
 
-        if ($Credential.UserName -ne $null){
+        if ($null -ne $Credential.UserName){
             $HashFilter.Add('Credential', $Credential)
         }
 
@@ -104,6 +102,8 @@ function Get-EventPsPipeline {
             $evtInfo['TimeCreated'] = [datetime]$evtXml.Event.System.TimeCreated.SystemTime
             $evtInfo['Computer'] = $evtXml.Event.System.Computer
             $evtInfo['Provider'] = $evtXml.Event.System.Provider.Name
+            $evtInfo['ProcessID'] = $evtXml.Event.System.Execution.ProcessID
+            $evtInfo['ThreadID'] = $evtXml.Event.System.Execution.ThreadID
             $evtData = $evtxml.Event.EventData.Data[1] -split "`n"
             foreach($line in $evtData) {
                 if ($line.trim() -ne '') {

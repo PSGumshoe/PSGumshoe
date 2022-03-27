@@ -1,9 +1,9 @@
 function Get-EventPsIPC {
     <#
     .Synopsis
-    Get Windows PowerShell IPC events.
+    Get Windows PowerShell Iter Prpcess Communication events.
     .DESCRIPTION
-    Get Windows PowerShell IPC events.
+    Get Windows PowerShell IPC events. This is useful in tracking if PS was used in the case the runspace start and end events are cleared.
     .EXAMPLE
     Example of how to use this cmdlet
     .EXAMPLE
@@ -95,7 +95,7 @@ function Get-EventPsIPC {
             $HashFilter.Add('ComputerName', $ComputerName)
         }
 
-        if ($Credential.UserName -ne $null){
+        if ($null -ne $Credential.UserName){
             $HashFilter.Add('Credential', $Credential)
         }
 
