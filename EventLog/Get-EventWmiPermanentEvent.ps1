@@ -92,10 +92,6 @@ function Get-EventWmiPermanentEvent {
     )
 
     begin {
-        
-    }
-
-    process {
         $Params = $MyInvocation.BoundParameters
 
         if ($Params.Keys -contains "Consumer") {
@@ -108,6 +104,11 @@ function Get-EventWmiPermanentEvent {
             $Params.Add('ESS', $JobTitle) | Out-Null
         }
 
+        
+    }
+
+    process {
+        
         Search-EventLogUsertData -EventId 5861 -Provider "Microsoft-Windows-WMI-Activity" -ReturnRecord -SubElement -ParamHash $Params | ForEach-Object {
             [xml]$evtxml = $_.toxml()
             $ProcInfo = [ordered]@{}

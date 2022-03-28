@@ -5,7 +5,7 @@ Author = "Carlos Perez (carlos_perez@darkoperator.com)"
 RootModule = 'PSGumshoe.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.0.1'
+ModuleVersion = '2.0.2'
 
 # ID used to uniquely identify this module
 GUID = '6f0aaa95-8bc2-43ef-b06c-440ba94a7e5d'
@@ -87,7 +87,6 @@ FunctionsToExport = @(
     'Clear-WinEvent',
     'Export-WinEvent',
     'Get-EventWmiQueryError',
-    'Search-EventLogUserData'
     'Get-EventWmiProviderStart',
     'Get-EventWmiOperationFailure',
     'Get-EventWmiTemporaryEvent',

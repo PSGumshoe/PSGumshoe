@@ -180,59 +180,55 @@ function Search-EventLogUsertData {
             $Params.Add("switchval") | Out-Null
         }
 
-        switch ($Params) {
-            ($Params -contains 'ComputerName') {
-               $ComputerName | ForEach-Object {
-                   Write-Verbose -Message "Querying $($_)"
-                   if ($null -eq $Credential) {
-                        if ($MaxEvents -gt 0) {
-                           if ($ReturnRecord) {
-                                Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue
-                            } else {
-                               Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
-                            }
+        if ($Params.Contains("ComputerName")) {
+            $ParamHash['ComputerName'] | ForEach-Object {
+                if ($Params -notcontains 'Credential') {
+                    if ($MaxEvents -gt 0) {
+                        if ($ReturnRecord) {
+                            Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue
                         } else {
-                            if ($ReturnRecord) {
-                                Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue 
-                            } else {
-                                Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
-                            }
-                       }
+                            Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                        }
                     } else {
-                        if ($MaxEvents -gt 0) {
-                            if ($ReturnRecord) {
-                                Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue
-                            } else {
-                                Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
-                            }
-                       } else {
-                            if ($ReturnRecord) {
-                                Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue
-                            } else {
-                                Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
-                            }
-                       }
-                   }
-               }
-           }
-           Default {
-                if ($MaxEvents -gt 0) {
-                    if ($ReturnRecord) {
-                        Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ErrorAction SilentlyContinue
-                    } else {
-                        Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                        if ($ReturnRecord) {
+                            Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue 
+                        } else {
+                            Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                        }
                     }
                 } else {
-                    if ($ReturnRecord) {
-                        Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue
+                    if ($MaxEvents -gt 0) {
+                        if ($ReturnRecord) {
+                            Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue
+                        } else {
+                            Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                        }
                     } else {
-                        Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                        if ($ReturnRecord) {
+                            Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue
+                        } else {
+                            Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                        }
                     }
                 }
-           }
-       }
-   }
-
+            }
+        }
+        else {
+            if ($MaxEvents -gt 0) {
+                if ($ReturnRecord) {
+                    Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ErrorAction SilentlyContinue
+                } else {
+                    Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                }
+            } else {
+                if ($ReturnRecord) {
+                    Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue
+                } else {
+                    Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                }
+            }
+        }
+    }
     end {
     }
 }

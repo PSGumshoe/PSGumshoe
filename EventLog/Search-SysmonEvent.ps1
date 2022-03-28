@@ -149,34 +149,32 @@ function Search-SysmonEvent {
    process {
 
        # Perform query and turn results in to a more easy to parse object.
-       switch ($PSCmdlet.ParameterSetName) {
-           'Remote' {
-               $ComputerName | ForEach-Object {
-                   if ($null -eq $Credential) {
-                       if ($MaxEvents -gt 0) {
-                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
-                       } else {
-                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
-                       }
-                   } else {
-                       if ($MaxEvents -gt 0) {
-                           Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue  | ConvertFrom-SysmonEventLogRecord
-                       } else {
-                           Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
-                       }
-                   }
-               }
-           }
-           Default {
-               if ($MaxEvents -gt 0) {
-                   Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue  -MaxEvents $MaxEvents | ConvertFrom-SysmonEventLogRecord
-               } else {
-                   Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
-               }
-           }
-       }
-   }
-
+       if ($Params.Contains("ComputerName")) {
+            $ParamHash["ComputerName"] | ForEach-Object {
+                if ($params -notcontains 'Credential') {
+                    if ($MaxEvents -gt 0) {
+                        Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
+                    } else {
+                        Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
+                    }
+                } else {
+                    if ($MaxEvents -gt 0) {
+                        Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue  | ConvertFrom-SysmonEventLogRecord
+                    } else {
+                        Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
+                    }
+                }
+            }
+        }
+        else {
+            if ($MaxEvents -gt 0) {
+                Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue  -MaxEvents $MaxEvents | ConvertFrom-SysmonEventLogRecord
+            } else {
+                Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue | ConvertFrom-SysmonEventLogRecord
+            }
+        }
+    }
+   
     end {
     }
 }

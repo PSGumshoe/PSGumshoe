@@ -168,10 +168,10 @@ function Search-EventLogEventData {
         }
 
         switch ($Params) {
-            ($Params -contains 'ComputerName') {
-               $ComputerName | ForEach-Object {
+            ('ComputerName') {
+               $ParamHash['ComputerName'] | ForEach-Object {
                    Write-Verbose -Message "Querying $($_)"
-                   if ($null -eq $Credential) {
+                   if ($Params -notcontains $Credential) {
                         if ($MaxEvents -gt 0) {
                            if ($ReturnRecord) {
                                 Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue

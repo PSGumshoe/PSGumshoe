@@ -115,11 +115,13 @@ function Get-EventWmiObjectAccess {
         $ChangeLogic
     )
 
-    begin {}
-
-    process {
+    begin {
         $Params = $MyInvocation.BoundParameters
         $Params.Add('ObjectServer', 'WMI') | Out-Null
+    }
+
+    process {
+        
         Search-EventLogEventData -EventId 4662 -Provider "Microsoft-Windows-Security-Auditing" -ParamHash $Params -ReturnRecord | ForEach-Object {
             [xml]$evtxml = $_.toxml()
             $ProcInfo = [ordered]@{}
