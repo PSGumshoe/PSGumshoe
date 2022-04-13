@@ -89,7 +89,22 @@ function Get-EventPsScriptBlock {
     }
     Process {
 
-        Search-EventLogEventData -EventId 4104 -ParamHash $Params -Provider "Microsoft-Windows-PowerShell" -RecordType "PSScriptBlock" 
+        Search-EventLogEventData -EventId 4104 -ParamHash $Params -Provider "Microsoft-Windows-PowerShell" -RecordType "PSScriptBlock" -ReturnRecord | ForEach-Object -Process {
+            [xml]$evtXml = $_.toxml()
+            $evtInfo = [ordered]@{}
+            $evtInfo['EventId'] = $evtXml.Event.System.EventID
+            $evtInfo['EventRecordID'] = $evtXml.Event.System.EventRecordID
+            $evtInfo['TimeCreated'] = [datetime]$evtXml.Event.System.TimeCreated.SystemTime
+            $evtInfo['Computer'] = $evtXml.Event.System.Computer
+            $evtInfo['Provider'] = $evtXml.Event.System.Provider.Name
+            $evtInfo['ProcessID'] = $evtXml.Event.System.Execution.ProcessID
+            $evtInfo['ThreadID'] = $evtXml.Event.System.Execution.ThreadID
+            $evtInfo['UserSID'] = $evtXml.Event.System.Security.UserID
+            $evtxml.Event.EventData.Data | ForEach-Object {
+                $evtInfo[$_.name] = $_.'#text'
+            }
+            New-Object psobject -Property $evtInfo
+        }
 
     }
     End {}

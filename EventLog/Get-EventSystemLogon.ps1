@@ -32,7 +32,7 @@ function Get-EventSystemLogon {
         $EventLogonType,
 
         # The name of the authentication package which was used for the logon authentication process. 
-        # Default packages loaded on LSA startup are located in �HKLM\SYSTEM\CurrentControlSet\Control\Lsa\OSConfig� registry key. 
+        # Default packages loaded on LSA startup are located in "HKLM\SYSTEM\CurrentControlSet\Control\Lsa\OSConfig" registry key. 
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
@@ -86,7 +86,7 @@ function Get-EventSystemLogon {
         # GUID that can help you correlate this event with another event that can contain the same Logon GUID for Example 4769
         # A Kerberos service ticket was requested event on a domain controller. It also can be used for correlation between a 
         # 4624 event and several other events (on the same computer) that can contain the same Logon GUID, Example of this is 
-        # “4648: A logon was attempted using explicit credentials” and “4964: Special groups have been assigned to a new logon.”
+        # "4648: A logon was attempted using explicit credentials" and "4964: Special groups have been assigned to a new logon.""
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
@@ -97,8 +97,8 @@ function Get-EventSystemLogon {
         # * Domain NETBIOS name example: CONTOSO
         # * Lowercase full domain name: contoso.local
         # * Uppercase full domain name: CONTOSO.LOCAL
-        # * For some well-known security principals, such as LOCAL SERVICE or ANONYMOUS LOGON, the value of this field is �NT AUTHORITY�.
-        # * For local user accounts, this field will contain the name of the computer or device that this account belongs to, for example: �Win81�.
+        # * For some well-known security principals, such as LOCAL SERVICE or ANONYMOUS LOGON, the value of this field is NT AUTHORITY.
+        # * For local user accounts, this field will contain the name of the computer or device that this account belongs to, for example: Win81.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
