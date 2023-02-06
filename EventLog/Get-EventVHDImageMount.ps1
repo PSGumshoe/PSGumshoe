@@ -48,6 +48,11 @@ function Get-EventVHDImageMount {
         [string[]]
         $Path,
 
+        # Type of image to search for, if not specified all mounted images are returned. ISO will return ISO images, VHD will return VHD and VMGS, VHDX will return VHDX and AVHDX.
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("ISO","VHD","VHDX")]
+        [string]
+        $VhdType,
 
         # Gets events from the event logs on the specified computer. Type the NetBIOS name, an Internet Protocol (IP) address, or the fully qualified domain name of the computer.
         # The default value is the local computer.
@@ -97,6 +102,19 @@ function Get-EventVHDImageMount {
 
     begin {
         $Params = $MyInvocation.BoundParameters
+
+        $vhdtypes = @{
+            "ISO" = 3
+            "VHD" = 1
+            "VHDX" = 2
+        }
+
+        if ($Params.Keys -contains "VhdType") {
+            $imageType = $params["VhdType"]
+            $Params.Remove("VhdType") | Out-Null
+            $Params.Add('VhdType', $vhdtypes[$imageType]) | Out-Null
+        }
+
         
     }
 
