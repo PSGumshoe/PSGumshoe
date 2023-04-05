@@ -58,7 +58,7 @@ FunctionsToExport = @(
     'Get-SysmonProcessCreateEvent',
     'Get-SysmonProcessTampering',
     'Get-SysmonProcessTerminateEvent',
-    'Get-SysmonRawAccessRead ',
+    'Get-SysmonRawAccessRead',
     'Get-SysmonRegistryKey',
     'Get-SysmonRegistryRename',
     'Get-SysmonRegistrySetValue',
