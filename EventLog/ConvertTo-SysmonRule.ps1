@@ -5,8 +5,7 @@ function ConvertTo-SysmonRule {
     .DESCRIPTION
         Funtion for creationg Rules or RuleGroups depending on the number of properties from Sysmon Event Objects. When more than
         1 property select will be turned in to RuleGroups, if only one property is present they are turned in to Rules. RuleGroups
-        have a Group Relation of 'and'. For rules since exact matches are used the conditions supported for selectio are 'is', 
-        'is not', "excludes",  "begin with" and "image". Default consition id none specified is "is"
+        have a Group Relation of 'and'.
     .EXAMPLE
         PS C:\> Get-SysmonProcessCreateEvent -Path C:\bootevents.evtx -Image "c:\windows\system32\svchost.exe" | select parentimage,commandline | ConvertTo-SysmonRule
         Create rule groups to filter on svchost.exe pararent process and command line.
@@ -28,7 +27,9 @@ function ConvertTo-SysmonRule {
 
         # Rule condition.
         [Parameter(Mandatory=$false)]
-        [ValidateSet('is', 'is not',"excludes",  "begin with","image")]
+        [ValidateSet("is","is not","contains","contains any","is any","contains all",
+            "excludes","excludes any","excludes all","begin with","not begin with",
+            "end with","not end with","less than","more than","image")]
         [string]
         $Condition = "is"
     )
