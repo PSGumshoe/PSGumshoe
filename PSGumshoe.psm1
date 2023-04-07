@@ -108,3 +108,8 @@
 . $PSScriptRoot\CIM\Get-CimComputerInfo.ps1
 . $PSScriptRoot\CIM\Get-CimDNSCache.ps1
 . $PSScriptRoot\CIM\Get-CimNetLogon.ps1
+
+# MITRE Functions
+#------------------------
+
+. $PSScriptRoot\mitre\New-NavigatorJson.ps1
