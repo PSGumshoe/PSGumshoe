@@ -101,10 +101,10 @@ FunctionsToExport = @(
     'Get-CimProcess',
     'Get-CimComputerInfo',
     'Get-CimDNSCache',
-    'Get-CimNetLogon'
+    'Get-CimNetLogon',
 
     #MITRE Functions
-    'New-NavigatorJson.ps1'
+    'New-NavigatorJson'
 )
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
