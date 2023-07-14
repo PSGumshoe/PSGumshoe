@@ -99,6 +99,7 @@
 . $PSScriptRoot\EventLog\Get-EventWmiPermanentEvent.ps1
 . $PSScriptRoot\EventLog\Get-EventWmiObjectAccess.ps1
 . $PSScriptRoot\EventLog\Get-EventVHDImageMount.ps1
+. $PSScriptRoot\EventLog\Get-SysmonFileExecutableDetected.ps1
 
 # CIM Collection Functions
 #-------------------------

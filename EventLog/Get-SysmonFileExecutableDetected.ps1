@@ -1,18 +1,15 @@
-function Get-SysmonFileDeleteDetectedEvent {
+function Get-SysmonFileExecutableDetected {
     <#
     .SYNOPSIS
-        Get Sysmon File Delete Detection and Archiving events (EventId 23).
+        Get Sysmon events for when the creation of PE file is detected (EventId 29).
     .DESCRIPTION
-        File delete operations are logged when a file is deleted. This event is useful for monitoring when a piece of malware or an actor deleted files to cover their tracks. This event id will not store the files, please look at FileDelete events for that.
+        Get Sysmon events for when the creation of PE file is detected (EventId 29). This event is tracked when event type FileExecutableDetected is enabled and Sysmon detects a file being created with a MZ PE file header. 
     .EXAMPLE
-        PS C:\> Get-SysmonFileDeleteDetectedEvent -Image 'C:\Windows\System32\certutil.exe'
-        Find events where certutil deleted a file on the machine.
     .INPUTS
         System.IO.FileInfo
     .OUTPUTS
-        Sysmon.EventRecord.FileDeleteDetected
+        Sysmon.EventRecord.FileExecutableDetected
     .NOTES
-        https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=90011
     #>
     [CmdletBinding(DefaultParameterSetName = 'Local')]
     param (
@@ -22,25 +19,25 @@ function Get-SysmonFileDeleteDetectedEvent {
         [string]
         $LogName = 'Microsoft-Windows-Sysmon/Operational',
 
-        # Process GUID for the process that deleted the file.
+        # Process GUID for the process that created the PE file.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessGuid,
 
-        # Process Id for the process that deleted the file.
+        # Process Id for the process that created the PE file.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $ProcessId,
 
-        # Image path for the process that deleted the file.
+        # Image path for the process that created the PE file.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $Image,
 
-        # Name of the file that was deleted.
+        # Name of the PE file that was created.
         [Parameter(Mandatory = $false,
                    ValueFromPipelineByPropertyName = $true)]
         [string[]]
@@ -51,7 +48,7 @@ function Get-SysmonFileDeleteDetectedEvent {
         [string[]]
         $RuleName,
 
-        # Hash(es) of the deleted file.
+        # Hash(es) of the PE file created.
         [Parameter(Mandatory = $false)]
         [string[]]
         $Hashes,
@@ -117,7 +114,8 @@ function Get-SysmonFileDeleteDetectedEvent {
     begin {}
 
     process {
-        Search-SysmonEvent -EventId 23 -ParamHash $MyInvocation.BoundParameters
+        Search-SysmonEvent -EventId 29 -ParamHash $MyInvocation.BoundParameters
+
     }
 
     end {}

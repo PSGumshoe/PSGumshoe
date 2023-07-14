@@ -48,6 +48,10 @@ function ConvertFrom-SysmonEventLogRecord {
             '23' = 'FileDelete'
             '24' = 'ClipboardChange '
             '25' = 'ProcessTamper'
+            '26' = 'FileDeleteDetected'
+            '27' = 'FileBlockExecutable'
+            '28' = 'FileBlockShredding'
+            '29' = 'FileExecutableDetected'
             '255' = 'Error'
         }
     }
