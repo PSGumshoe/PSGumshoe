@@ -23,6 +23,10 @@ function Search-EventLogEventData {
         [int[]]
         $EventId,
 
+        # Event Record Id to filter on
+        [int[]]
+        $EventRecordId,
+
         # Record type to output.
         [string]
         $RecordType,

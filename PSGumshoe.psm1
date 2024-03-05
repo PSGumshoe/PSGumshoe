@@ -75,6 +75,7 @@
 . $PSScriptRoot\EventLog\ConvertFrom-EventLogonRecord.ps1
 . $PSScriptRoot\EventLog\ConvertFrom-EventEventXMLRecord.ps1
 . $PSScriptRoot\EventLog\Get-EventSystemLogon.ps1
+. $PSScriptRoot\EventLog\Get-EventSystemLogonFailure.ps1
 . $PSScriptRoot\EventLog\Get-EventSystemLogoff.ps1
 . $PSScriptRoot\EventLog\Get-EventTerminalLogon.ps1
 . $PSScriptRoot\EventLog\Get-EventTerminalLogoff.ps1
@@ -89,6 +90,8 @@
 . $PSScriptRoot\EventLog\Get-SysmonFileBlockExecutable.ps1
 . $PSScriptRoot\EventLog\Get-SysmonFileBlockShredding.ps1
 . $PSScriptRoot\EventLog\Get-EventProcessCreate.ps1
+. $PSScriptRoot\EventLog\Get-EventKerberosPreAuthFailure.ps1
+. $PSScriptRoot\EventLog\Get-EventKerberosTGTRequest.ps1
 . $PSScriptRoot\EventLog\ConvertTo-SysmonRule.ps1
 . $PSScriptRoot\EventLog\Clear-WinEvent.ps1
 . $PSScriptRoot\EventLog\Export-WinEvent.ps1
@@ -100,6 +103,7 @@
 . $PSScriptRoot\EventLog\Get-EventWmiObjectAccess.ps1
 . $PSScriptRoot\EventLog\Get-EventVHDImageMount.ps1
 . $PSScriptRoot\EventLog\Get-SysmonFileExecutableDetected.ps1
+. $PSScriptRoot\EventLog\Get-EventSystemLoginAttempt.ps1
 
 # CIM Collection Functions
 #-------------------------
