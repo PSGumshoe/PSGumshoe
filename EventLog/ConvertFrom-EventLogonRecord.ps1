@@ -1,15 +1,15 @@
 function ConvertFrom-EventLogonRecord {
     <#
     .SYNOPSIS
-        Function to turn EventLog4624 successful logon event in to a flat object. 
+        Function to turn an EventLog Record in to a flat object. 
     .DESCRIPTION
-        Function to turn EventLog4624 successful logon event in to a flat object. 
+        Function to turn an EventLog Record in to a flat object. 
     .INPUTS
         Inputs (if any)
     .OUTPUTS
         PSObject
     .NOTES
-        General notes
+        Author: Carlos Perez, carlos_perez[at]darkoperator.com
     #>
     [CmdletBinding()]
     param (
@@ -25,15 +25,29 @@ function ConvertFrom-EventLogonRecord {
 
     process {
         [xml]$evtxml = $Event.toxml()
-        $ProcInfo = [ordered]@{}
-        $ProcInfo['EventId'] = $evtxml.Event.System.EventID
-        $ProcInfo['Computer'] = $evtxml.Event.System.Computer
-        $ProcInfo['EventRecordID'] = $evtxml.Event.System.EventRecordID
-        $ProcInfo['TimeCreated'] = [datetime]$evtXml.Event.System.TimeCreated.SystemTime
-        $evtxml.Event.EventData.Data | ForEach-Object {
-            $ProcInfo[$_.name] = $_.'#text'
+        $EventInfo = [ordered]@{}
+        $evtxml.Event.System.ChildNodes | foreach-object {
+            if ($_.psobject.properties.name -match "#text"){
+                $EventInfo[$_.name] = $_."#text"                
+            }
         }
-        $Obj = New-Object psobject -Property $ProcInfo
+        $EventInfo['TimeCreated'] = [datetime]$evtXml.Event.System.TimeCreated.SystemTime
+        $EventInfo['TimeCreatedUTC'] = $evtXml.Event.System.TimeCreated.SystemTime
+        $EventInfo['ProviderName'] = $evtXml.Event.System.Provider.Name
+        $EventInfo['ProviderGuid'] = $evtXml.Event.System.Provider.Guid
+
+        if ($null -ne $evtxml.Event.EventData.Data) {
+            $evtxml.Event.EventData.Data | ForEach-Object {
+                $EventInfo[$_.name] = $_.'#text'
+            }
+        }
+
+        if ($null -ne $evtxml.Event.UserData.Data) {
+            $evtxml.Event.UserData.Data | ForEach-Object {
+                $EventInfo[$_.name] = $_.'#text'
+            }
+        }
+        $Obj = New-Object psobject -Property $EventInfo
         $Obj
     }
 

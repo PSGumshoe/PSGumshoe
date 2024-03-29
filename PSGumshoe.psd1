@@ -101,6 +101,8 @@ FunctionsToExport = @(
     'Get-EventWmiPermanentEvent',
     'Get-EventWmiObjectAccess',
     'Get-EventVHDImageMount',
+    'convertFrom-EventLogonRecord',
+    'ConvertFrom-EventlogSDDL'
     # CIM Functions
     'Get-CimLogonSession',
     'Get-CimProcessLogonSession',
@@ -110,7 +112,9 @@ FunctionsToExport = @(
     'Get-CimNetLogon',
 
     #MITRE Functions
-    'New-NavigatorJson'
+    'New-NavigatorJson',
+
+    'ConvertTo-SDDL'
 )
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.

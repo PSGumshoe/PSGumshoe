@@ -29,6 +29,7 @@
 . $PSScriptRoot\Analysis\Measure-CharacterFrequency.ps1
 . $PSScriptRoot\Analysis\Measure-DamerauLevenshteinDistance.ps1
 . $PSScriptRoot\Analysis\Measure-VectorSimilarity.ps1
+. $PSScriptRoot\Analysis\ConvertTo-SDDL.ps1
 
 # Event Log Functions
 #-----------------------------
@@ -104,6 +105,7 @@
 . $PSScriptRoot\EventLog\Get-EventVHDImageMount.ps1
 . $PSScriptRoot\EventLog\Get-SysmonFileExecutableDetected.ps1
 . $PSScriptRoot\EventLog\Get-EventSystemLoginAttempt.ps1
+. $PSScriptRoot\EventLog\ConvertFrom-EventlogSDDL.ps1
 
 # CIM Collection Functions
 #-------------------------
