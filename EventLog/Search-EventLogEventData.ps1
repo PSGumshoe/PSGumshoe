@@ -211,13 +211,13 @@ function Search-EventLogEventData {
                     if ($ReturnRecord) {
                         Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ErrorAction SilentlyContinue
                     } else {
-                        Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                        Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ErrorAction SilentlyContinue | ConvertFrom-EventLogRecord
                     }
                 } else {
                     if ($ReturnRecord) {
                         Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue
                     } else {
-                        Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                        Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue | ConvertFrom-EventLogRecord
                     }
                 }
            }

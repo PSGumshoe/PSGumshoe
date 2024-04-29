@@ -1,4 +1,4 @@
-function ConvertFrom-EventLogonRecord {
+function ConvertFrom-EventLogRecord {
     <#
     .SYNOPSIS
         Function to turn an EventLog Record in to a flat object. 

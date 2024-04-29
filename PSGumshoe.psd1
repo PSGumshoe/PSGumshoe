@@ -101,8 +101,11 @@ FunctionsToExport = @(
     'Get-EventWmiPermanentEvent',
     'Get-EventWmiObjectAccess',
     'Get-EventVHDImageMount',
-    'convertFrom-EventLogonRecord',
-    'ConvertFrom-EventlogSDDL'
+    'convertFrom-EventLogRecord',
+    'ConvertFrom-EventlogSDDL',
+    'Get-FilteredEvent',
+    'Export-EventLogToCSV',
+
     # CIM Functions
     'Get-CimLogonSession',
     'Get-CimProcessLogonSession',
@@ -113,7 +116,6 @@ FunctionsToExport = @(
 
     #MITRE Functions
     'New-NavigatorJson',
-
     'ConvertTo-SDDL'
 )
 

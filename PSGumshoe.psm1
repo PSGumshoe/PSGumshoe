@@ -73,7 +73,7 @@
 . $PSScriptRoot\EventLog\Get-SysmonProcessActivityEvent.ps1
 . $PSScriptRoot\EventLog\Search-EventLogEventData.ps1
 . $PSScriptRoot\EventLog\Search-EventLogEventXML.ps1
-. $PSScriptRoot\EventLog\ConvertFrom-EventLogonRecord.ps1
+. $PSScriptRoot\EventLog\ConvertFrom-EventLogRecord.ps1
 . $PSScriptRoot\EventLog\ConvertFrom-EventEventXMLRecord.ps1
 . $PSScriptRoot\EventLog\Get-EventSystemLogon.ps1
 . $PSScriptRoot\EventLog\Get-EventSystemLogonFailure.ps1
@@ -106,6 +106,8 @@
 . $PSScriptRoot\EventLog\Get-SysmonFileExecutableDetected.ps1
 . $PSScriptRoot\EventLog\Get-EventSystemLoginAttempt.ps1
 . $PSScriptRoot\EventLog\ConvertFrom-EventlogSDDL.ps1
+. $PSScriptRoot\EventLog\Get-FilteredEvent.ps1
+. $PSScriptRoot\EventLog\Export-EventLogToCSV.ps1
 
 # CIM Collection Functions
 #-------------------------

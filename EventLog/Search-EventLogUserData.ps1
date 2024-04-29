@@ -187,13 +187,13 @@ function Search-EventLogUsertData {
                         if ($ReturnRecord) {
                             Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue
                         } else {
-                            Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                            Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-EventLogRecord
                         }
                     } else {
                         if ($ReturnRecord) {
                             Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue 
                         } else {
-                            Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                            Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -ErrorAction SilentlyContinue | ConvertFrom-EventLogRecord
                         }
                     }
                 } else {
@@ -201,13 +201,13 @@ function Search-EventLogUsertData {
                         if ($ReturnRecord) {
                             Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue
                         } else {
-                            Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                            Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-EventLogRecord
                         }
                     } else {
                         if ($ReturnRecord) {
                             Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue
                         } else {
-                            Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                            Get-WinEvent -FilterXml $BaseFilter -ComputerName $_ -Credential $Credential -ErrorAction SilentlyContinue | ConvertFrom-EventLogRecord
                         }
                     }
                 }
@@ -218,13 +218,13 @@ function Search-EventLogUsertData {
                 if ($ReturnRecord) {
                     Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ErrorAction SilentlyContinue
                 } else {
-                    Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                    Get-WinEvent -FilterXml $BaseFilter -MaxEvents $MaxEvents -ErrorAction SilentlyContinue | ConvertFrom-EventLogRecord
                 }
             } else {
                 if ($ReturnRecord) {
                     Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue
                 } else {
-                    Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue | ConvertFrom-EventLogonRecord
+                    Get-WinEvent -FilterXml $BaseFilter -ErrorAction SilentlyContinue | ConvertFrom-EventLogRecord
                 }
             }
         }
