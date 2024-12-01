@@ -108,6 +108,7 @@
 . $PSScriptRoot\EventLog\ConvertFrom-EventlogSDDL.ps1
 . $PSScriptRoot\EventLog\Get-FilteredEvent.ps1
 . $PSScriptRoot\EventLog\Export-EventLogToCSV.ps1
+. $PSScriptRoot\EventLog\Split-EventRecordCsv.ps1
 
 # CIM Collection Functions
 #-------------------------
