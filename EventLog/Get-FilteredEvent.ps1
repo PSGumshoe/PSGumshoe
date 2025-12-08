@@ -172,7 +172,7 @@ function Get-FilteredEvent {
         }
         $paramSplat['FilterHashTable'] = $FilterHashTable
         if ($ParseData) {
-            Get-WinEvent @paramSplat | convertFrom-EventLogRecord
+            Get-WinEvent @paramSplat | ConvertFrom-EventLogRecord
         } else {
             Get-WinEvent @paramSplat
         }
@@ -181,5 +181,3 @@ function Get-FilteredEvent {
 
     }
 }
-
-

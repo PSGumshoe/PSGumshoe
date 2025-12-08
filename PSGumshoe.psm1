@@ -105,7 +105,7 @@
 . $PSScriptRoot\EventLog\Get-EventVHDImageMount.ps1
 . $PSScriptRoot\EventLog\Get-SysmonFileExecutableDetected.ps1
 . $PSScriptRoot\EventLog\Get-EventSystemLoginAttempt.ps1
-. $PSScriptRoot\EventLog\ConvertFrom-EventlogSDDL.ps1
+. $PSScriptRoot\EventLog\ConvertFrom-EventLogSDDL.ps1
 . $PSScriptRoot\EventLog\Get-FilteredEvent.ps1
 . $PSScriptRoot\EventLog\Export-EventLogToCSV.ps1
 . $PSScriptRoot\EventLog\Split-EventRecordCsv.ps1

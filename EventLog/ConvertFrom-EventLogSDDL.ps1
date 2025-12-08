@@ -4,9 +4,9 @@
 .DESCRIPTION
     Converts a SDDL string from an EventLog to a more human readable format providing EventLog specific permissions.
 .EXAMPLE
-    ConvertFrom-EventlogSDDL -SddlString (Get-WinEventLog -LogName Security).SecurityDescriptor
+    ConvertFrom-EventLogSDDL -SddlString (Get-WinEventLog -LogName Security).SecurityDescriptor
 #>
-function ConvertFrom-EventlogSDDL {
+function ConvertFrom-EventLogSDDL {
     [CmdletBinding()]
     param (
         # EventLog SDDL String
